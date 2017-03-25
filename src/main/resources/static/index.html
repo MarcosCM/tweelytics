@@ -1,0 +1,43 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Cliente MVC Twitter</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport"/>
+    <!-- Bootstrap -->
+    <link href="/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="/webjars/jquery/jquery.min.js"></script>
+    <script src="/webjars/sockjs-client/sockjs.min.js"></script>
+    <script src="/webjars/stomp-websocket/stomp.min.js"></script>
+    <script src="/functions.js"></script>
+</head>
+<body>
+<nav class="navbar navbar-default" role="navigation">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+        <p class="navbar-brand">Cliente MVC Twitter</p>
+        <p class="navbar-text">Desarrollo de Aplicaciones Distribuidas
+            2017-2018</p>
+    </div>
+    <div class="nav navbar-right">
+        <a title="UNIZAR" href="http://www.unizar.es"><img height="50" src="/logoUZ.png" /></a>
+    </div>
+</nav>
+<div class="container">
+    <!-- Formulario principal -->
+    <form id="search" action="search" method="get">
+        <div class="row">
+            <input type="text" class="form-control" id="q" name="q"
+                   placeholder="Escribe algo que quieras buscar"/>
+        </div>
+        <div class="row">&nbsp;</div>
+        <div class="row">
+            <button type="submit" class="btn btn-default center-block">Buscar</button>
+        </div>
+    </form>
+    <div class="row">&nbsp;</div>
+    <div id="resultsBlock"></div>
+</div>
+</body>
+</html>
