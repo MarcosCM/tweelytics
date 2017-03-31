@@ -14,6 +14,7 @@ import org.springframework.social.twitter.api.Stream;
 import org.springframework.social.twitter.api.impl.TwitterTemplate;
 import org.springframework.stereotype.Service;
 
+import es.unizar.tmdad.tweelytics.domain.TextAnalyzer;
 import es.unizar.tmdad.tweelytics.service.SimpleStreamListener;
 
 @Service
@@ -26,6 +27,9 @@ public class TwitterLookupService {
 	
 	@Autowired
 	private TwitterTemplate twitterTemplate;
+	
+	@Autowired
+	private TextAnalyzer textAnalyzer;
 	
 	@Value("${twitter.consumerKey}")
 	private String consumerKey;
@@ -56,7 +60,7 @@ public class TwitterLookupService {
 		fsp.track(query);
 		//fsp.addLocation(-180, -90, 180, 90);
 		
-        streams.putIfAbsent(query, twitterTemplate.streamingOperations().filter(fsp, Collections.singletonList(new SimpleStreamListener(messagingTemplate, query))));
+        streams.putIfAbsent(query, twitterTemplate.streamingOperations().filter(fsp, Collections.singletonList(new SimpleStreamListener(messagingTemplate, query, textAnalyzer))));
         logger.info("TwitterLUService added stream for query: " + query);
     }
 }
