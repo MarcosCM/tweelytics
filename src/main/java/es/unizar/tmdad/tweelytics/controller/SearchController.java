@@ -1,4 +1,4 @@
-package es.unizar.tmdad.lab0.controller;
+package es.unizar.tmdad.tweelytics.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;
 
-import es.unizar.tmdad.lab0.entity.TwitterQuery;
-import es.unizar.tmdad.lab0.service.TwitterLookupService;
+import es.unizar.tmdad.tweelytics.domain.TwitterQuery;
+import es.unizar.tmdad.tweelytics.service.TwitterLookupService;
 
 @Controller
 public class SearchController {

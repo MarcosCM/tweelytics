@@ -1,8 +1,7 @@
-package es.unizar.tmdad.lab0.service;
+package es.unizar.tmdad.tweelytics.service;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -10,30 +9,23 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.social.twitter.api.FilterStreamParameters;
 import org.springframework.social.twitter.api.Stream;
-import org.springframework.social.twitter.api.StreamListener;
-import org.springframework.social.twitter.api.Twitter;
 import org.springframework.social.twitter.api.impl.TwitterTemplate;
 import org.springframework.stereotype.Service;
+
+import es.unizar.tmdad.tweelytics.service.SimpleStreamListener;
 
 @Service
 public class TwitterLookupService {
 	
 	private static final Logger logger = LoggerFactory.getLogger(TwitterLookupService.class);
 	
-	private static final int MAX_STREAMS = 10;
-	
 	@Autowired
 	private SimpMessageSendingOperations messagingTemplate;
 	
-	// Queried streams
-	// LinkedHashMap to guarantee FIFO replacement when max number of streams is reached (insertion-ordered)
-	private LinkedHashMap<String, Stream> streams = new LinkedHashMap<String, Stream>(MAX_STREAMS){
-		// Remove oldest entry when max number of streams is reached
-		protected boolean removeEldestEntry(Map.Entry<String, Stream> eldest){
-			return this.size() > MAX_STREAMS;
-		}
-	};
+	@Autowired
+	private TwitterTemplate twitterTemplate;
 	
 	@Value("${twitter.consumerKey}")
 	private String consumerKey;
@@ -47,15 +39,24 @@ public class TwitterLookupService {
 	@Value("${twitter.accessTokenSecret}")
 	private String accessTokenSecret;
 	
+	private static final int MAX_STREAMS = 10;
+	
+	// Queried streams
+	// LinkedHashMap to guarantee FIFO replacement when max number of streams is reached (insertion-ordered)
+	private LinkedHashMap<String, Stream> streams = new LinkedHashMap<String, Stream>(MAX_STREAMS){
+		// Remove oldest entry when max number of streams is reached
+		protected boolean removeEldestEntry(Map.Entry<String, Stream> eldest){
+			return this.size() > MAX_STREAMS;
+		}
+	};
+	
 	public void search(String query) {
 		logger.info("TwitterLUService search called with query: " + query);
-		// Do nothing if stream was already queried
-		if (streams.containsKey(query)) return;
+		FilterStreamParameters fsp = new FilterStreamParameters();
+		fsp.track(query);
+		//fsp.addLocation(-180, -90, 180, 90);
 		
-        Twitter twitter = new TwitterTemplate(consumerKey, consumerSecret, accessToken, accessTokenSecret);
-        List<StreamListener> list = new ArrayList<StreamListener>();
-        list.add(new SimpleStreamListener(messagingTemplate, query));
-        streams.put(query, twitter.streamingOperations().filter(query,  list));
+        streams.putIfAbsent(query, twitterTemplate.streamingOperations().filter(fsp, Collections.singletonList(new SimpleStreamListener(messagingTemplate, query))));
         logger.info("TwitterLUService added stream for query: " + query);
     }
 }

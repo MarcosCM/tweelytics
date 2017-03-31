@@ -1,4 +1,4 @@
-package es.unizar.tmdad.lab0.service;
+package es.unizar.tmdad.tweelytics.service;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,6 +12,8 @@ import org.springframework.social.twitter.api.StreamListener;
 import org.springframework.social.twitter.api.StreamWarningEvent;
 import org.springframework.social.twitter.api.Tweet;
 import org.springframework.util.MimeTypeUtils;
+
+import es.unizar.tmdad.tweelytics.domain.MyTweet;
 
 public class SimpleStreamListener implements StreamListener {
 
@@ -37,11 +39,13 @@ public class SimpleStreamListener implements StreamListener {
 
 	@Override
 	public void onTweet(Tweet tweet) {
-		logger.info("Received tweet from query "+ query +": " + tweet);
+		logger.info("Received tweet from query "+ query +": " + tweet.getText());
+		MyTweet myTweet = new MyTweet(tweet, query);
+		
 		Map<String, Object> headers = new HashMap<String, Object>();
 		headers.put(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON);
 		// (destination, payload, headers)
-		messageSendingOperations.convertAndSend("/queue/search/" + query, tweet, headers);
+		messageSendingOperations.convertAndSend("/queue/search/" + query, myTweet, headers);
 	}
 
 	@Override
