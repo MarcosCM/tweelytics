@@ -7,17 +7,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.indico.Indico;
 import io.indico.api.Api;
 import io.indico.api.results.BatchIndicoResult;
 import io.indico.api.utils.IndicoException;
 
 public class TextAnalyzer {
-	
-	private static final Logger logger = LoggerFactory.getLogger(TextAnalyzer.class);
 	
 	private Indico indico;
 	
@@ -28,7 +23,6 @@ public class TextAnalyzer {
 	 */
 	public TextAnalyzer(String apiKey) throws IndicoException{
 		this.indico = new Indico(apiKey);
-		logger.info("Created @Bean TextAnalyzer");
 	}
 	
 	/**
