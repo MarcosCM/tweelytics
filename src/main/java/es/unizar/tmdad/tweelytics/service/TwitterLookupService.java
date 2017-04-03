@@ -14,8 +14,8 @@ import org.springframework.social.twitter.api.Stream;
 import org.springframework.social.twitter.api.impl.TwitterTemplate;
 import org.springframework.stereotype.Service;
 
-import es.unizar.tmdad.tweelytics.domain.QueryAggregator;
-import es.unizar.tmdad.tweelytics.domain.TextAnalyzer;
+import es.unizar.tmdad.tweelytics.entities.TextAnalyzer;
+import es.unizar.tmdad.tweelytics.entities.QueryAggregator;
 import es.unizar.tmdad.tweelytics.repository.AnalyzedTweetRepository;
 import es.unizar.tmdad.tweelytics.service.SimpleStreamListener;
 

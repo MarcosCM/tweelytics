@@ -1,4 +1,4 @@
-package es.unizar.tmdad.tweelytics.domain;
+package es.unizar.tmdad.tweelytics.entities;
 
 import java.util.Map;
 

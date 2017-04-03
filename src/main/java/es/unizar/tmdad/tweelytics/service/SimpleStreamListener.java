@@ -16,10 +16,9 @@ import org.springframework.util.MimeTypeUtils;
 import es.unizar.tmdad.tweelytics.domain.AnalyticsResponse;
 import es.unizar.tmdad.tweelytics.domain.AnalyzedTweet;
 import es.unizar.tmdad.tweelytics.domain.QueriedTweet;
-import es.unizar.tmdad.tweelytics.domain.QueryAggregator;
-import es.unizar.tmdad.tweelytics.domain.TextAnalyzer;
+import es.unizar.tmdad.tweelytics.entities.QueryAggregator;
+import es.unizar.tmdad.tweelytics.entities.TextAnalyzer;
 import es.unizar.tmdad.tweelytics.repository.AnalyzedTweetRepository;
-import io.indico.api.results.BatchIndicoResult;
 
 public class SimpleStreamListener implements StreamListener {
 
@@ -55,7 +54,7 @@ public class SimpleStreamListener implements StreamListener {
 		// save tweet
 		QueriedTweet queriedTweet = new QueriedTweet(tweet, query);
 		
-		BatchIndicoResult res = null;
+		Map<String, Double> res = null;
 		try {
 			res = textAnalyzer.singleTextAnalysis(queriedTweet);
 		} catch (Exception e) {
@@ -64,7 +63,7 @@ public class SimpleStreamListener implements StreamListener {
 		
 		AnalyzedTweet analyzedTweet = new AnalyzedTweet();
 		analyzedTweet.setQueriedTweet(queriedTweet);
-		analyzedTweet.setIndicoResults(res);
+		analyzedTweet.setAnalyticsResults(res);
 		// save in persistent storage
 		analyzedTweetRepository.save(analyzedTweet);
 		
@@ -72,8 +71,6 @@ public class SimpleStreamListener implements StreamListener {
 		AnalyticsResponse analyticsResponse = new AnalyticsResponse();
 		analyticsResponse.setAnalyzedTweet(analyzedTweet);
 		analyticsResponse.setOverallAnalytics(queryAggregator.analyzeQuery(query));
-		
-		logger.info(analyticsResponse.getOverallAnalytics().toString());
 		
 		Map<String, Object> headers = new HashMap<String, Object>();
 		headers.put(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON);

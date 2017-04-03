@@ -58,16 +58,32 @@ function subscribeTweetQuery(tweetQuery) {
 				+ '<div class="panel-body">'+ response.analyzedTweet.queriedTweet.text +'</div>'
 				+ '</div>';
 
+        var totalEmotions = response.overallAnalytics.anger + response.overallAnalytics.joy
+                + response.overallAnalytics.fear + response.overallAnalytics.sadness + response.overallAnalytics.surprise;
+        var angerNormalized = response.overallAnalytics.anger / totalEmotions;
+        var joyNormalized = response.overallAnalytics.joy / totalEmotions;
+        var fearNormalized = response.overallAnalytics.fear / totalEmotions;
+        var sadnessNormalized = response.overallAnalytics.sadness / totalEmotions;
+        var surpriseNormalized = response.overallAnalytics.surprise / totalEmotions;
+
 		// Parse analytics results
 		var analyticsContent = '';
-		analyticsContent +='<div class="row">'
-				+ '		<div class="col-xs-12 text-center"><h2>Sentiment analysis</h2></div>'
+		analyticsContent +='<div class="row text-center">'
+				+ '		<div class="col-xs-12"><h2>Sentiment analysis (total)</h2></div>'
 				+ '		<div class="col-xs-12">Anger: '+response.overallAnalytics.anger+'</div>'
 				+ '		<div class="col-xs-12">Joy: '+response.overallAnalytics.joy+'</div>'
 				+ '		<div class="col-xs-12">Fear: '+response.overallAnalytics.fear+'</div>'
 				+ '		<div class="col-xs-12">Sadness: '+response.overallAnalytics.sadness+'</div>'
 				+ '		<div class="col-xs-12">Surprise: '+response.overallAnalytics.surprise+'</div>'
 				+ '</div>';
+        analyticsContent += '<div class="row text-center">'
+                + '     <div class="col-xs-12"><h2>Sentiment analysis (normalized)</h2></div>'
+                + '     <div class="col-xs-12">Anger: '+(angerNormalized*100).toFixed(2)+'%</div>'
+                + '     <div class="col-xs-12">Joy: '+(joyNormalized*100).toFixed(2)+'%</div>'
+                + '     <div class="col-xs-12">Fear: '+(fearNormalized*100).toFixed(2)+'%</div>'
+                + '     <div class="col-xs-12">Sadness: '+(sadnessNormalized*100).toFixed(2)+'%</div>'
+                + '     <div class="col-xs-12">Surprise: '+(surpriseNormalized*100).toFixed(2)+'%</div>'
+                + '</div>';
 		// Set content
 		analyticsResults.html(analyticsContent);
 		resultsBlock.prepend(tweetContent);
