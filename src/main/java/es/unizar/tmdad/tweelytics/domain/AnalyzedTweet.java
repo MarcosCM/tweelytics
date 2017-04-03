@@ -12,8 +12,7 @@ public class AnalyzedTweet {
 
 	@Id
 	private BigInteger id;
-	private MyTweet myTweet;
-	private String tweetText;
+	private QueriedTweet queriedTweet;
 	private BatchIndicoResult indicoResults;
 	
 	public AnalyzedTweet(){
@@ -28,12 +27,8 @@ public class AnalyzedTweet {
 		this.id = id;
 	}
 
-	public String getTweetText() {
-		return tweetText;
-	}
-
-	public void setTweetText(String tweetText) {
-		this.tweetText = tweetText;
+	public String getOriginalText() {
+		return queriedTweet.getOriginalText();
 	}
 
 	public BatchIndicoResult getIndicoResults() {
@@ -44,11 +39,11 @@ public class AnalyzedTweet {
 		this.indicoResults = indicoResults;
 	}
 
-	public MyTweet getMyTweet() {
-		return myTweet;
+	public QueriedTweet getQueriedTweet() {
+		return queriedTweet;
 	}
 
-	public void setMyTweet(MyTweet myTweet) {
-		this.myTweet = myTweet;
+	public void setQueriedTweet(QueriedTweet queriedTweet) {
+		this.queriedTweet = queriedTweet;
 	}
 }

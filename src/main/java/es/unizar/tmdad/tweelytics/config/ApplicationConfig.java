@@ -4,11 +4,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import es.unizar.tmdad.tweelytics.domain.QueryAggregator;
 import es.unizar.tmdad.tweelytics.domain.TextAnalyzer;
 import io.indico.api.utils.IndicoException;
 
 @Configuration
-public class TextAnalyzerConfig {
+public class ApplicationConfig {
 	
 	public static final String SENTIMENT_API = 		"sentiment";
 	public static final String SENTIMENT_HQ_API = 	"sentiment_hq";
@@ -22,5 +23,10 @@ public class TextAnalyzerConfig {
 	@Bean
 	public TextAnalyzer textAnalyzer() throws IndicoException{
 		return new TextAnalyzer(apiKey);
+	}
+	
+	@Bean
+	public QueryAggregator queryAggregator(){
+		return new QueryAggregator();
 	}
 }

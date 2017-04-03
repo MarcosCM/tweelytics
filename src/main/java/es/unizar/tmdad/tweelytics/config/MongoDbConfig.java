@@ -16,7 +16,7 @@ import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 
 @Configuration
-@EnableMongoRepositories(basePackageClasses=es.unizar.tmdad.tweelytics.domain.AnalyzedTweet.class)
+@EnableMongoRepositories(basePackageClasses=es.unizar.tmdad.tweelytics.repository.AnalyzedTweetRepository.class)
 @PropertySource(value = { "classpath:database.properties" })
 public class MongoDbConfig {
 

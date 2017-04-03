@@ -7,17 +7,17 @@ import org.springframework.social.twitter.api.Entities;
 import org.springframework.social.twitter.api.Tweet;
 import org.springframework.social.twitter.api.TwitterProfile;
 
-public class MyTweet {
+public class QueriedTweet {
 
 	private Tweet tweet;
 	private String myQuery;
 	private String text;
 
-	public MyTweet(Tweet tweet) {
+	public QueriedTweet(Tweet tweet) {
 		this.tweet = tweet;
 	}
 	
-	public MyTweet(Tweet tweet, String myQuery) {
+	public QueriedTweet(Tweet tweet, String myQuery) {
 		this.tweet = tweet;
 		this.myQuery = myQuery;
 		this.text = tweet.getText().replaceAll("(?i)("+myQuery+")", "<strong>$1</strong>");
@@ -35,16 +35,16 @@ public class MyTweet {
 		return tweet.getExtraData();
 	}
 
-	public String getText() {
+	public String getOriginalText() {
 		return tweet.getText();
 	}
 	
-	public void setUnmodifiedText(String text) {
+	public void setText(String text) {
 		this.text = text;
 	}
 
-	public String getUnmodifiedText() {
-		return text!=null? text: tweet.getUnmodifiedText();
+	public String getText() {
+		return text != null ? text : tweet.getUnmodifiedText();
 	}
 
 	public Date getCreatedAt() {

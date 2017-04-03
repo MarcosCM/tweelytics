@@ -6,6 +6,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import es.unizar.tmdad.tweelytics.domain.AnalyzedTweet;
 
-public interface TweetRepository extends MongoRepository<AnalyzedTweet, BigInteger>, TweetRepositoryCustom{
+public interface AnalyzedTweetRepository extends MongoRepository<AnalyzedTweet, BigInteger>, AnalyzedTweetRepositoryCustom{
 
 }

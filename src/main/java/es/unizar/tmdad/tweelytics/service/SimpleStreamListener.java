@@ -13,11 +13,13 @@ import org.springframework.social.twitter.api.StreamWarningEvent;
 import org.springframework.social.twitter.api.Tweet;
 import org.springframework.util.MimeTypeUtils;
 
-import es.unizar.tmdad.tweelytics.domain.MyTweet;
+import es.unizar.tmdad.tweelytics.domain.AnalyticsResponse;
+import es.unizar.tmdad.tweelytics.domain.AnalyzedTweet;
+import es.unizar.tmdad.tweelytics.domain.QueriedTweet;
+import es.unizar.tmdad.tweelytics.domain.QueryAggregator;
 import es.unizar.tmdad.tweelytics.domain.TextAnalyzer;
-import io.indico.api.Api;
+import es.unizar.tmdad.tweelytics.repository.AnalyzedTweetRepository;
 import io.indico.api.results.BatchIndicoResult;
-import io.indico.api.text.PoliticalClass;
 
 public class SimpleStreamListener implements StreamListener {
 
@@ -26,11 +28,15 @@ public class SimpleStreamListener implements StreamListener {
 	private SimpMessageSendingOperations messageSendingOperations;
 	private String query;
 	private TextAnalyzer textAnalyzer;
+	private AnalyzedTweetRepository analyzedTweetRepository;
+	private QueryAggregator queryAggregator;
 	
-	public SimpleStreamListener(SimpMessageSendingOperations messageSendingOperations, String query, TextAnalyzer textAnalyzer){
+	public SimpleStreamListener(SimpMessageSendingOperations messageSendingOperations, String query, TextAnalyzer textAnalyzer, AnalyzedTweetRepository analyzedTweetRepository, QueryAggregator queryAggregator){
 		this.messageSendingOperations = messageSendingOperations;
 		this.query = query;
 		this.textAnalyzer = textAnalyzer;
+		this.analyzedTweetRepository = analyzedTweetRepository;
+		this.queryAggregator = queryAggregator;
 	}
 	
 	@Override
@@ -46,25 +52,33 @@ public class SimpleStreamListener implements StreamListener {
 	@Override
 	public void onTweet(Tweet tweet) {
 		logger.info("Received tweet from query "+ query +": " + tweet.getText());
-		MyTweet myTweet = new MyTweet(tweet, query);
+		// save tweet
+		QueriedTweet queriedTweet = new QueriedTweet(tweet, query);
 		
-		Api[] apiList = {Api.SentimentHQ, Api.Political};
-		BatchIndicoResult res;
+		BatchIndicoResult res = null;
 		try {
-			res = textAnalyzer.singleTextAnalysis(myTweet, apiList);
-			Double sentimentHq = res.getSentimentHQ().get(0);
-			Map<PoliticalClass, Double> politicalClasses = res.getPolitical().get(0);
-			
-			logger.info(String.format("Text: %s, SentimentHQ: %.5f, Libertarian: %.5f, Green: %.5f, Liberal: %.5f, Conservative: %.5f", myTweet.getText(), sentimentHq,
-					politicalClasses.get(PoliticalClass.Libertarian), politicalClasses.get(PoliticalClass.Green), politicalClasses.get(PoliticalClass.Liberal), politicalClasses.get(PoliticalClass.Conservative)));
+			res = textAnalyzer.singleTextAnalysis(queriedTweet);
 		} catch (Exception e) {
 			logger.info(e.getMessage());
 		}
 		
+		AnalyzedTweet analyzedTweet = new AnalyzedTweet();
+		analyzedTweet.setQueriedTweet(queriedTweet);
+		analyzedTweet.setIndicoResults(res);
+		// save in persistent storage
+		analyzedTweetRepository.save(analyzedTweet);
+		
+		// build response
+		AnalyticsResponse analyticsResponse = new AnalyticsResponse();
+		analyticsResponse.setAnalyzedTweet(analyzedTweet);
+		analyticsResponse.setOverallAnalytics(queryAggregator.analyzeQuery(query));
+		
+		logger.info(analyticsResponse.getOverallAnalytics().toString());
+		
 		Map<String, Object> headers = new HashMap<String, Object>();
 		headers.put(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON);
 		// (destination, payload, headers)
-		messageSendingOperations.convertAndSend("/queue/search/" + query, myTweet, headers);
+		messageSendingOperations.convertAndSend("/queue/search/" + query, analyticsResponse, headers);
 	}
 
 	@Override

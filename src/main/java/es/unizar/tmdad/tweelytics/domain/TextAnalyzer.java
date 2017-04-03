@@ -27,14 +27,27 @@ public class TextAnalyzer {
 	
 	/**
 	 * Analyzes a set of predictions over the text of a tweet
-	 * @param myTweet Tweet being analyzed
+	 * @param queriedTweet Tweet being analyzed
+	 * @return Result of the predictions by the Indico API
+	 * @throws IndicoException
+	 * @throws IOException
+	 */
+	public BatchIndicoResult singleTextAnalysis(QueriedTweet queriedTweet) throws IndicoException, IOException{
+		return batchTextAnalysis(Collections.singletonList(queriedTweet),
+				//new Api[]{Api.SentimentHQ, Api.Emotion, Api.TwitterEngagement, Api.Political});
+				new Api[]{Api.Emotion});
+	}
+	
+	/**
+	 * Analyzes a set of predictions over the text of a tweet
+	 * @param queriedTweet Tweet being analyzed
 	 * @param apiList APIs indicating which predictions to be performed over the tweet
 	 * @return Result of the predictions by the Indico API
 	 * @throws IndicoException
 	 * @throws IOException
 	 */
-	public BatchIndicoResult singleTextAnalysis(MyTweet myTweet, Api[] apiList) throws IndicoException, IOException{
-		return batchTextAnalysis(Collections.singletonList(myTweet), apiList);
+	public BatchIndicoResult singleTextAnalysis(QueriedTweet queriedTweet, Api[] apiList) throws IndicoException, IOException{
+		return batchTextAnalysis(Collections.singletonList(queriedTweet), apiList);
 	}
 	
 	/**
@@ -45,12 +58,12 @@ public class TextAnalyzer {
 	 * @throws IndicoException
 	 * @throws IOException
 	 */
-	public BatchIndicoResult batchTextAnalysis(List<MyTweet> myTweets, Api[] apiList) throws IndicoException, IOException{
+	public BatchIndicoResult batchTextAnalysis(List<QueriedTweet> queriedTweets, Api[] apiList) throws IndicoException, IOException{
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("apis", apiList);
 		return indico.text
-				.predict(myTweets.stream()
-					.map(myTw -> myTw.getText())
+				.predict(queriedTweets.stream()
+					.map(myTw -> myTw.getOriginalText())
 					.collect(Collectors.toList()), params);
 	}
 }

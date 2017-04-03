@@ -6,10 +6,12 @@ var stompClient = null;
 var subscription = null;
 var qTextInput = null;
 var resultsBlock = null;
+var analyticsResults = null;
 
 $(document).ready(function() {
 	qTextInput = $('input#q');
 	resultsBlock = $("#resultsBlock");
+	analyticsResults = $("#analyticsResults");
     // Create websocket
     connectWebSocket();
 	registerSearch();
@@ -38,24 +40,37 @@ function subscribeTweetQuery(tweetQuery) {
 	if (subscription != null) subscription.unsubscribe();
 	// Subscribe new query
 	subscription = stompClient.subscribe(subscriptionEndpointPrefix+tweetQuery, function(tweet){
-		console.log('Received: ' + tweet);
+		console.log('Received: ' + tweet.body);
 
         // Convert int to string before parsing => avoid loss of accuracy
-		var pTweet = tweet.body.replace(/\"id\":(\d+)/g, function(s, match){
+		var response = tweet.body.replace(/\"id\":(\d+)/g, function(s, match){
 			return "\"id\":\""+match+"\"";
 		});
-		pTweet = JSON.parse(pTweet);
-		var content = '';
-		content +='<div class="row panel panel-default">'
+		response = JSON.parse(response);
+		var tweetContent = '';
+		tweetContent +='<div class="row panel panel-default">'
 				+ '<div class="panel-heading">'
-				+ '		<a href="https://twitter.com/'+ pTweet.fromUser +'" target="_blank"><b>@'+ pTweet.fromUser +'</b></a>'
+				+ '		<a href="https://twitter.com/'+ response.analyzedTweet.queriedTweet.fromUser +'" target="_blank"><b>@'+ response.analyzedTweet.queriedTweet.fromUser +'</b></a>'
 				+ '		<div class="pull-right">'
-				+ '			<a href="https://twitter.com/'+ pTweet.fromUser +'/status/'+ pTweet.id +'" target="_blank"><span class="glyphicon glyphicon-link"></span></a>'
+				+ '			<a href="https://twitter.com/'+ response.analyzedTweet.queriedTweet.fromUser +'/status/'+ response.analyzedTweet.queriedTweet.id +'" target="_blank"><span class="glyphicon glyphicon-link"></span></a>'
 				+ '		</div>'
 				+ '</div>'
-				+ '<div class="panel-body">'+ pTweet.unmodifiedText +'</div>'
+				+ '<div class="panel-body">'+ response.analyzedTweet.queriedTweet.text +'</div>'
 				+ '</div>';
-		$("#resultsBlock").prepend(content);
+
+		// Parse analytics results
+		var analyticsContent = '';
+		analyticsContent +='<div class="row">'
+				+ '		<div class="col-xs-12 text-center"><h2>Sentiment analysis</h2></div>'
+				+ '		<div class="col-xs-12">Anger: '+response.overallAnalytics.anger+'</div>'
+				+ '		<div class="col-xs-12">Joy: '+response.overallAnalytics.joy+'</div>'
+				+ '		<div class="col-xs-12">Fear: '+response.overallAnalytics.fear+'</div>'
+				+ '		<div class="col-xs-12">Sadness: '+response.overallAnalytics.sadness+'</div>'
+				+ '		<div class="col-xs-12">Surprise: '+response.overallAnalytics.surprise+'</div>'
+				+ '</div>';
+		// Set content
+		analyticsResults.html(analyticsContent);
+		resultsBlock.prepend(tweetContent);
 	}, function(error){
 		// Error connecting to the endpoint
 		console.log('Error: ' + error);
