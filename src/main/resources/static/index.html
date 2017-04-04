@@ -32,12 +32,29 @@
                    placeholder="Escribe algo que quieras buscar"/>
         </div>
         <div class="row">&nbsp;</div>
+        <div class="row search-filter">
+            <div class="col-xs-4 checkbox">
+                <label><input id="Emotion" type="checkbox" value="">Emotion</label>
+            </div>
+            <div class="col-xs-4 checkbox">
+                <label><input id="Political" type="checkbox" value="">Political</label>
+            </div>
+            <div class="col-xs-4 checkbox">
+                <label><input id="TwitterEngagement" type="checkbox" value="">Twitter Engagement</label>
+            </div>
+        </div>
         <div class="row">
             <button type="submit" class="btn btn-default center-block">Buscar</button>
         </div>
     </form>
     <div class="row">&nbsp;</div>
-    <div class="row"><div class="col-xs-12" id="analyticsResults"></div></div>
+    <div class="row">
+        <div class="col-xs-12" id="analyticsResults">
+            <div class="row"><div class="col-xs-12" id="EmotionResults"></div></div>
+            <div class="row"><div class="col-xs-12" id="PoliticalResults"></div></div>
+            <div class="row"><div class="col-xs-12" id="TwitterEngagementResults"></div></div>
+        </div>
+    </div>
     <div class="row">&nbsp;</div>
     <div id="resultsBlock"></div>
 </div>

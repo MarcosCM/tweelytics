@@ -1,26 +1,24 @@
 /* STOMP, SockJS, WebSockets */
 var webSocketEndpoint = '/twitterSearch';
-var subscriptionEndpointPrefix = '/queue/search/';
+var subscriptionEndpointPrefix = '/queue/search';
 
 var stompClient = null;
-var subscription = null;
+var subscriptions = {};
 var qTextInput = null;
 var resultsBlock = null;
-var analyticsResults = null;
-
-// total to normalize emotions
-var totalEmotions = 0.0;
-// total of single emotion
-var totalAnger = 0.0;
-var totalJoy = 0.0;
-var totalFear = 0.0;
-var totalSadness = 0.0;
-var totalSurprise = 0.0;
+var analyticsResults = {};
+var searchFilters = null;
+var total = {};
+var normalized = {};
 
 $(document).ready(function() {
 	qTextInput = $('input#q');
+	searchFilters = $(".search-filter input");
 	resultsBlock = $("#resultsBlock");
-	analyticsResults = $("#analyticsResults");
+	$("[id$='Results']").each(function(idx){
+		var id = $(this).attr('id');
+		analyticsResults[id] = $(this);
+	});
     // Create websocket
     connectWebSocket();
 	registerSearch();
@@ -30,7 +28,10 @@ function registerSearch() {
 	$("#search").submit(function(event){
 		// Clean tweets
 		resultsBlock.empty();
-		subscribeTweetQuery(qTextInput.val());
+		$(analyticsResults).each(function(idx){
+			$(this).empty();
+		});
+		subscribeTweetQuery();
 
 		event.preventDefault();
 	});
@@ -43,68 +44,73 @@ function connectWebSocket() {
 	});
 }
 
-function subscribeTweetQuery(tweetQuery) {
-    console.log("TweetQuery: " + tweetQuery);
-	// Unsubscribe previous query
-	if (subscription != null) subscription.unsubscribe();
+function subscribeTweetQuery() {
+	var tweetQuery = qTextInput.val();
 	// Subscribe new query
-	subscription = stompClient.subscribe(subscriptionEndpointPrefix+'Emotion/'+tweetQuery, function(tweet){
-        // Convert int to string before parsing => avoid loss of accuracy
-		var response = tweet.body.replace(/\"id\":(\d+)/g, function(s, match){
-			return "\"id\":\""+match+"\"";
-		});
-		response = JSON.parse(response);
-		var tweetContent = '';
-		tweetContent +='<div class="row panel panel-default">'
-				+ '<div class="panel-heading">'
-				+ '		<a href="https://twitter.com/'+ response.queriedTweet.fromUser +'" target="_blank"><b>@'+ response.queriedTweet.fromUser +'</b></a>'
-				+ '		<div class="pull-right">'
-				+ '			<a href="https://twitter.com/'+ response.queriedTweet.fromUser +'/status/'+ response.queriedTweet.id +'" target="_blank"><span class="glyphicon glyphicon-link"></span></a>'
-				+ '		</div>'
-				+ '</div>'
-				+ '<div class="panel-body">'+ response.queriedTweet.text +'</div>'
-				+ '</div>';
+	searchFilters.each(function(idx){
+		var filterName = $(this).attr('id');
 
-        totalEmotions += response.analyticsResults["Emotion.anger"] + response.analyticsResults["Emotion.joy"]
-                + response.analyticsResults["Emotion.fear"] + response.analyticsResults["Emotion.sadness"] + response.analyticsResults["Emotion.surprise"];
-        totalAnger += response.analyticsResults["Emotion.anger"];
-        totalJoy += response.analyticsResults["Emotion.joy"];
-        totalFear += response.analyticsResults["Emotion.fear"];
-        totalSadness += response.analyticsResults["Emotion.sadness"];
-        totalSurprise += response.analyticsResults["Emotion.surprise"];
-        var angerNormalized = totalAnger / totalEmotions;
-        var joyNormalized = totalJoy / totalEmotions;
-        var fearNormalized = totalFear / totalEmotions;
-        var sadnessNormalized = totalSadness / totalEmotions;
-        var surpriseNormalized = totalSurprise / totalEmotions;
+		// Unsubscribe previous query
+		if (subscriptions[filterName] != null){
+			subscriptions[filterName].unsubscribe();
+			subscriptions[filterName] = null;
+		}
 
-		// Parse analytics results
-		var analyticsContent = '';
-		analyticsContent +='<div class="row text-center">'
-				+ '		<div class="col-xs-12"><h2>Sentiment analysis (total)</h2></div>'
-				+ '		<div class="col-xs-12">Anger: '+totalAnger+'</div>'
-				+ '		<div class="col-xs-12">Joy: '+totalJoy+'</div>'
-				+ '		<div class="col-xs-12">Fear: '+totalFear+'</div>'
-				+ '		<div class="col-xs-12">Sadness: '+totalSadness+'</div>'
-				+ '		<div class="col-xs-12">Surprise: '+totalSurprise+'</div>'
-				+ '</div>';
-        analyticsContent += '<div class="row text-center">'
-                + '     <div class="col-xs-12"><h2>Sentiment analysis (normalized)</h2></div>'
-                + '     <div class="col-xs-12">Anger: '+(angerNormalized*100).toFixed(2)+'%</div>'
-                + '     <div class="col-xs-12">Joy: '+(joyNormalized*100).toFixed(2)+'%</div>'
-                + '     <div class="col-xs-12">Fear: '+(fearNormalized*100).toFixed(2)+'%</div>'
-                + '     <div class="col-xs-12">Sadness: '+(sadnessNormalized*100).toFixed(2)+'%</div>'
-                + '     <div class="col-xs-12">Surprise: '+(surpriseNormalized*100).toFixed(2)+'%</div>'
-                + '</div>';
-		// Set content
-		analyticsResults.html(analyticsContent);
-		resultsBlock.prepend(tweetContent);
-	}, function(error){
-		// Error connecting to the endpoint
-		console.log('Error: ' + error);
+		// If filter param is checked then subscribe
+		if ($(this).is(':checked')){
+			subscriptions[filterName] = stompClient.subscribe(subscriptionEndpointPrefix+'/'+filterName+'/'+tweetQuery, function(tweet){
+		        // Convert int to string before parsing => avoid loss of accuracy
+				var response = tweet.body.replace(/\"id\":(\d+)/g, function(s, match){
+					return "\"id\":\""+match+"\"";
+				});
+				response = JSON.parse(response);
+				var tweetContent = '';
+				tweetContent +='<div class="row panel panel-default">'
+						+ '<div class="panel-heading">'
+						+ '		<a href="https://twitter.com/'+ response.queriedTweet.fromUser +'" target="_blank"><b>@'+ response.queriedTweet.fromUser +'</b></a>'
+						+ '		<div class="pull-right">'
+						+ '			<a href="https://twitter.com/'+ response.queriedTweet.fromUser +'/status/'+ response.queriedTweet.id +'" target="_blank"><span class="glyphicon glyphicon-link"></span></a>'
+						+ '		</div>'
+						+ '</div>'
+						+ '<div class="panel-body">'+ response.queriedTweet.text +'</div>'
+						+ '</div>';
+
+				$.each(response.analyticsResults, function(idx, val){
+					if (total[idx] == null) total[idx] = val;
+					else total[idx] += val;
+					if (total[filterName] == null) total[filterName] = val;
+					else total[filterName] += val;
+				});
+
+				// Parse analytics results
+				var analyticsContent = '';
+				analyticsContent += '<div class="row text-center">'
+						+ '		<div class="col-xs-12"><h2>'+filterName+' analysis (total)</h2></div>';
+
+				$.each(response.analyticsResults, function(idx, val){
+					analyticsContent += '<div class="col-xs-12">'+idx+': '+total[idx]+'</div>';
+				});
+
+				analyticsContent += '</div>'
+						+ '<div class="row text-center">'
+		                + '     <div class="col-xs-12"><h2>'+filterName+' analysis (normalized)</h2></div>';
+
+		        $.each(response.analyticsResults, function(idx, val){
+		        	normalized[idx] = total[idx] / total[filterName];
+					analyticsContent += '<div class="col-xs-12">'+idx+': '+normalized[idx]+'</div>';
+				});
+
+		        analyticsContent += '</div>';
+				// Set content
+				analyticsResults[filterName+'Results'].html(analyticsContent);
+				resultsBlock.prepend(tweetContent);
+			}, function(error){
+				// Error connecting to the endpoint
+				console.log('Error: ' + error);
+			});
+		}
 	});
 
-	console.log("sending tweet query to /app/search");
 	// Request search stream over the query
 	stompClient.send("/app/search", {}, JSON.stringify({'query' : tweetQuery}));
 }
