@@ -13,12 +13,10 @@ import org.springframework.social.twitter.api.StreamWarningEvent;
 import org.springframework.social.twitter.api.Tweet;
 import org.springframework.util.MimeTypeUtils;
 
-import es.unizar.tmdad.tweelytics.domain.AnalyticsResponse;
 import es.unizar.tmdad.tweelytics.domain.AnalyzedTweet;
 import es.unizar.tmdad.tweelytics.domain.QueriedTweet;
-import es.unizar.tmdad.tweelytics.entities.QueryAggregator;
-import es.unizar.tmdad.tweelytics.entities.TextAnalyzer;
-import es.unizar.tmdad.tweelytics.repository.AnalyzedTweetRepository;
+import es.unizar.tmdad.tweelytics.entities.TweetSaver;
+import es.unizar.tmdad.tweelytics.entities.Analyzer;
 
 public class SimpleStreamListener implements StreamListener {
 
@@ -26,16 +24,14 @@ public class SimpleStreamListener implements StreamListener {
 	
 	private SimpMessageSendingOperations messageSendingOperations;
 	private String query;
-	private TextAnalyzer textAnalyzer;
-	private AnalyzedTweetRepository analyzedTweetRepository;
-	private QueryAggregator queryAggregator;
+	private Analyzer analyzer;
+	private TweetSaver tweetSaver;
 	
-	public SimpleStreamListener(SimpMessageSendingOperations messageSendingOperations, String query, TextAnalyzer textAnalyzer, AnalyzedTweetRepository analyzedTweetRepository, QueryAggregator queryAggregator){
+	public SimpleStreamListener(SimpMessageSendingOperations messageSendingOperations, String query, Analyzer analyzer, TweetSaver tweetSaver){
 		this.messageSendingOperations = messageSendingOperations;
 		this.query = query;
-		this.textAnalyzer = textAnalyzer;
-		this.analyzedTweetRepository = analyzedTweetRepository;
-		this.queryAggregator = queryAggregator;
+		this.analyzer = analyzer;
+		this.tweetSaver = tweetSaver;
 	}
 	
 	@Override
@@ -51,12 +47,14 @@ public class SimpleStreamListener implements StreamListener {
 	@Override
 	public void onTweet(Tweet tweet) {
 		logger.info("Received tweet from query "+ query +": " + tweet.getText());
+		// save in persistent storage
+		tweetSaver.save(tweet);
 		// save tweet
 		QueriedTweet queriedTweet = new QueriedTweet(tweet, query);
 		
 		Map<String, Double> res = null;
 		try {
-			res = textAnalyzer.singleTextAnalysis(queriedTweet);
+			res = analyzer.singleAnalysis(queriedTweet);
 		} catch (Exception e) {
 			logger.info(e.getMessage());
 		}
@@ -64,18 +62,11 @@ public class SimpleStreamListener implements StreamListener {
 		AnalyzedTweet analyzedTweet = new AnalyzedTweet();
 		analyzedTweet.setQueriedTweet(queriedTweet);
 		analyzedTweet.setAnalyticsResults(res);
-		// save in persistent storage
-		analyzedTweetRepository.save(analyzedTweet);
-		
-		// build response
-		AnalyticsResponse analyticsResponse = new AnalyticsResponse();
-		analyticsResponse.setAnalyzedTweet(analyzedTweet);
-		analyticsResponse.setOverallAnalytics(queryAggregator.analyzeQuery(query));
 		
 		Map<String, Object> headers = new HashMap<String, Object>();
 		headers.put(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON);
 		// (destination, payload, headers)
-		messageSendingOperations.convertAndSend("/queue/search/" + query, analyticsResponse, headers);
+		messageSendingOperations.convertAndSend("/queue/search/" + analyzer.getType() + "/" + query, analyzedTweet, headers);
 	}
 
 	@Override

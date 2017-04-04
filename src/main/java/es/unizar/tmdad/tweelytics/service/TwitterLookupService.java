@@ -2,6 +2,7 @@ package es.unizar.tmdad.tweelytics.service;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -14,9 +15,8 @@ import org.springframework.social.twitter.api.Stream;
 import org.springframework.social.twitter.api.impl.TwitterTemplate;
 import org.springframework.stereotype.Service;
 
-import es.unizar.tmdad.tweelytics.entities.TextAnalyzer;
-import es.unizar.tmdad.tweelytics.entities.QueryAggregator;
-import es.unizar.tmdad.tweelytics.repository.AnalyzedTweetRepository;
+import es.unizar.tmdad.tweelytics.entities.Analyzer;
+import es.unizar.tmdad.tweelytics.entities.TweetSaver;
 import es.unizar.tmdad.tweelytics.service.SimpleStreamListener;
 
 @Service
@@ -25,19 +25,13 @@ public class TwitterLookupService {
 	private static final Logger logger = LoggerFactory.getLogger(TwitterLookupService.class);
 	
 	@Autowired
-	private AnalyzedTweetRepository analyzedTweetRepository;
-	
-	@Autowired
-	private QueryAggregator queryAggregator;
+	private TweetSaver tweetSaver;
 	
 	@Autowired
 	private SimpMessageSendingOperations messagingTemplate;
 	
 	@Autowired
 	private TwitterTemplate twitterTemplate;
-	
-	@Autowired
-	private TextAnalyzer textAnalyzer;
 	
 	@Value("${twitter.consumerKey}")
 	private String consumerKey;
@@ -62,13 +56,13 @@ public class TwitterLookupService {
 		}
 	};
 	
-	public void search(String query) {
+	public void search(String query, List<Analyzer> analyzers) {
 		logger.info("TwitterLUService search called with query: " + query);
 		FilterStreamParameters fsp = new FilterStreamParameters();
 		fsp.track(query);
 		//fsp.addLocation(-180, -90, 180, 90);
 		
-        streams.putIfAbsent(query, twitterTemplate.streamingOperations().filter(fsp, Collections.singletonList(new SimpleStreamListener(messagingTemplate, query, textAnalyzer, analyzedTweetRepository, queryAggregator))));
+		analyzers.forEach(analyzer -> streams.putIfAbsent(query, twitterTemplate.streamingOperations().filter(fsp, Collections.singletonList(new SimpleStreamListener(messagingTemplate, query, analyzer, tweetSaver)))));
         logger.info("TwitterLUService added stream for query: " + query);
     }
 }

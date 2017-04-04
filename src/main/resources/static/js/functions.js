@@ -8,6 +8,15 @@ var qTextInput = null;
 var resultsBlock = null;
 var analyticsResults = null;
 
+// total to normalize emotions
+var totalEmotions = 0.0;
+// total of single emotion
+var totalAnger = 0.0;
+var totalJoy = 0.0;
+var totalFear = 0.0;
+var totalSadness = 0.0;
+var totalSurprise = 0.0;
+
 $(document).ready(function() {
 	qTextInput = $('input#q');
 	resultsBlock = $("#resultsBlock");
@@ -39,9 +48,7 @@ function subscribeTweetQuery(tweetQuery) {
 	// Unsubscribe previous query
 	if (subscription != null) subscription.unsubscribe();
 	// Subscribe new query
-	subscription = stompClient.subscribe(subscriptionEndpointPrefix+tweetQuery, function(tweet){
-		console.log('Received: ' + tweet.body);
-
+	subscription = stompClient.subscribe(subscriptionEndpointPrefix+'Emotion/'+tweetQuery, function(tweet){
         // Convert int to string before parsing => avoid loss of accuracy
 		var response = tweet.body.replace(/\"id\":(\d+)/g, function(s, match){
 			return "\"id\":\""+match+"\"";
@@ -50,31 +57,36 @@ function subscribeTweetQuery(tweetQuery) {
 		var tweetContent = '';
 		tweetContent +='<div class="row panel panel-default">'
 				+ '<div class="panel-heading">'
-				+ '		<a href="https://twitter.com/'+ response.analyzedTweet.queriedTweet.fromUser +'" target="_blank"><b>@'+ response.analyzedTweet.queriedTweet.fromUser +'</b></a>'
+				+ '		<a href="https://twitter.com/'+ response.queriedTweet.fromUser +'" target="_blank"><b>@'+ response.queriedTweet.fromUser +'</b></a>'
 				+ '		<div class="pull-right">'
-				+ '			<a href="https://twitter.com/'+ response.analyzedTweet.queriedTweet.fromUser +'/status/'+ response.analyzedTweet.queriedTweet.id +'" target="_blank"><span class="glyphicon glyphicon-link"></span></a>'
+				+ '			<a href="https://twitter.com/'+ response.queriedTweet.fromUser +'/status/'+ response.queriedTweet.id +'" target="_blank"><span class="glyphicon glyphicon-link"></span></a>'
 				+ '		</div>'
 				+ '</div>'
-				+ '<div class="panel-body">'+ response.analyzedTweet.queriedTweet.text +'</div>'
+				+ '<div class="panel-body">'+ response.queriedTweet.text +'</div>'
 				+ '</div>';
 
-        var totalEmotions = response.overallAnalytics.anger + response.overallAnalytics.joy
-                + response.overallAnalytics.fear + response.overallAnalytics.sadness + response.overallAnalytics.surprise;
-        var angerNormalized = response.overallAnalytics.anger / totalEmotions;
-        var joyNormalized = response.overallAnalytics.joy / totalEmotions;
-        var fearNormalized = response.overallAnalytics.fear / totalEmotions;
-        var sadnessNormalized = response.overallAnalytics.sadness / totalEmotions;
-        var surpriseNormalized = response.overallAnalytics.surprise / totalEmotions;
+        totalEmotions += response.analyticsResults["Emotion.anger"] + response.analyticsResults["Emotion.joy"]
+                + response.analyticsResults["Emotion.fear"] + response.analyticsResults["Emotion.sadness"] + response.analyticsResults["Emotion.surprise"];
+        totalAnger += response.analyticsResults["Emotion.anger"];
+        totalJoy += response.analyticsResults["Emotion.joy"];
+        totalFear += response.analyticsResults["Emotion.fear"];
+        totalSadness += response.analyticsResults["Emotion.sadness"];
+        totalSurprise += response.analyticsResults["Emotion.surprise"];
+        var angerNormalized = totalAnger / totalEmotions;
+        var joyNormalized = totalJoy / totalEmotions;
+        var fearNormalized = totalFear / totalEmotions;
+        var sadnessNormalized = totalSadness / totalEmotions;
+        var surpriseNormalized = totalSurprise / totalEmotions;
 
 		// Parse analytics results
 		var analyticsContent = '';
 		analyticsContent +='<div class="row text-center">'
 				+ '		<div class="col-xs-12"><h2>Sentiment analysis (total)</h2></div>'
-				+ '		<div class="col-xs-12">Anger: '+response.overallAnalytics.anger+'</div>'
-				+ '		<div class="col-xs-12">Joy: '+response.overallAnalytics.joy+'</div>'
-				+ '		<div class="col-xs-12">Fear: '+response.overallAnalytics.fear+'</div>'
-				+ '		<div class="col-xs-12">Sadness: '+response.overallAnalytics.sadness+'</div>'
-				+ '		<div class="col-xs-12">Surprise: '+response.overallAnalytics.surprise+'</div>'
+				+ '		<div class="col-xs-12">Anger: '+totalAnger+'</div>'
+				+ '		<div class="col-xs-12">Joy: '+totalJoy+'</div>'
+				+ '		<div class="col-xs-12">Fear: '+totalFear+'</div>'
+				+ '		<div class="col-xs-12">Sadness: '+totalSadness+'</div>'
+				+ '		<div class="col-xs-12">Surprise: '+totalSurprise+'</div>'
 				+ '</div>';
         analyticsContent += '<div class="row text-center">'
                 + '     <div class="col-xs-12"><h2>Sentiment analysis (normalized)</h2></div>'

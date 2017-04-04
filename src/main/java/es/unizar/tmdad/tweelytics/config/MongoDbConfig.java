@@ -12,14 +12,15 @@ import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 import com.mongodb.MongoClient;
+import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 
 @Configuration
-@EnableMongoRepositories(basePackageClasses=es.unizar.tmdad.tweelytics.repository.AnalyzedTweetRepository.class)
+@EnableMongoRepositories(basePackageClasses=es.unizar.tmdad.tweelytics.repository.TweetRepository.class)
 @PropertySource(value = { "classpath:database.properties" })
 public class MongoDbConfig {
-
+	
 	@Value("${mongo.host}")
 	private String host;
 	
@@ -35,11 +36,15 @@ public class MongoDbConfig {
 	@Value("${mongo.pw}")
 	private String pw;
 	
+	@Value("${mongo.max_connections_per_host}")
+	private String maxConnectionsPerHost;
+	
 	@Bean
     public MongoDbFactory mongoDbFactory() throws Exception {
         ServerAddress sv = new ServerAddress(host, Integer.parseInt(port));
         MongoCredential credential = MongoCredential.createCredential(user, db, pw.toCharArray());
-        MongoClient mongoClient = new MongoClient(sv, Arrays.asList(credential));
+        MongoClientOptions mongoClientOptions = MongoClientOptions.builder().connectionsPerHost(Integer.parseInt(maxConnectionsPerHost)).build();
+        MongoClient mongoClient = new MongoClient(sv, Arrays.asList(credential), mongoClientOptions);
         return new SimpleMongoDbFactory(mongoClient, db);
     }
 	
