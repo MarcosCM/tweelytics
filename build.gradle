@@ -23,6 +23,7 @@ repositories {
 }
 
 dependencies {
+	compile("org.springframework.boot:spring-boot-starter-web")
     compile("org.springframework.boot:spring-boot-starter-social-twitter")
     compile("org.springframework.boot:spring-boot-starter-websocket")
     compile("org.springframework.data:spring-data-mongodb:1.10.1.RELEASE")
@@ -32,6 +33,7 @@ dependencies {
     compile("org.webjars:bootstrap:3.3.7")
     compile("org.webjars:jquery:3.1.0")
     compile("io.indico:io.indico:3.14.0")
+    compile("com.rabbitmq:amqp-client:4.1.0")
 }
 
 tasks.withType(JavaExec) {
