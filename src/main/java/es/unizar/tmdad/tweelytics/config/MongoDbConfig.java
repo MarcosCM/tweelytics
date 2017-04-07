@@ -36,7 +36,7 @@ public class MongoDbConfig {
 	@Value("${mongo.pw}")
 	private String pw;
 	
-	@Value("${mongo.max_connections_per_host}")
+	@Value("${mongo.maxConnectionsPerHost}")
 	private String maxConnectionsPerHost;
 	
 	@Bean

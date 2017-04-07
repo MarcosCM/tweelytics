@@ -1,13 +1,10 @@
 package es.unizar.tmdad.tweelytics.service;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
@@ -17,7 +14,6 @@ import org.springframework.social.twitter.api.StreamListener;
 import org.springframework.social.twitter.api.impl.TwitterTemplate;
 import org.springframework.stereotype.Service;
 
-import es.unizar.tmdad.tweelytics.entities.Analyzer;
 import es.unizar.tmdad.tweelytics.entities.EmotionAnalyzer;
 import es.unizar.tmdad.tweelytics.entities.PoliticalAnalyzer;
 import es.unizar.tmdad.tweelytics.entities.TweetSaver;
@@ -26,8 +22,6 @@ import es.unizar.tmdad.tweelytics.service.SimpleStreamListener;
 
 @Service
 public class TwitterLookupService {
-	
-	private static final Logger logger = LoggerFactory.getLogger(TwitterLookupService.class);
 	
 	@Autowired
 	private TweetSaver tweetSaver;

@@ -25,8 +25,18 @@
     </div>
 </nav>
 <div class="container">
-    <!-- Formulario principal -->
-    <form id="search" action="search" method="get">
+	<!-- TWITTER AUTH -->
+	<div class="row">
+		<div class="col-xs-12 col-md-offset-4 col-md-4">
+			<form id="twitterLogin" action="/connect/twitter" method="POST">
+				<input type="hidden" name="scope" value="email">
+				<button type="submit" id="twitterLoginRedirect" class="btn btn-lg btn-info btn-block">Twitter</button>
+			</form>
+		</div>
+	</div>
+    <div class="row">&nbsp;</div>
+    <!-- TWITTER SEARCH -->
+    <form id="search" action="/search" method="GET">
         <div class="row">
             <input type="text" class="form-control" id="q" name="q"
                    placeholder="Escribe algo que quieras buscar"/>

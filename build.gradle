@@ -24,18 +24,32 @@ repositories {
 
 dependencies {
 	compile("org.springframework.boot:spring-boot-starter-web")
-	compile("org.springframework.boot:spring-boot-starter-security")
-	compile("org.springframework.security.oauth:spring-security-oauth2:2.1.0.RELEASE")
+	// Spring Security
+	compile("org.springframework.security:spring-security-web:4.2.2.RELEASE")
+	compile("org.springframework.security:spring-security-config:4.2.2.RELEASE")
+	// Spring Social
+	compile("org.springframework.social:spring-social-core:1.1.4.RELEASE")
+	compile("org.springframework.social:spring-social-web:1.1.4.RELEASE")
+	compile("org.springframework.social:spring-social-config:1.1.4.RELEASE")
+	compile("org.springframework.social:spring-social-security:1.1.4.RELEASE")
+	// Twitter
     compile("org.springframework.boot:spring-boot-starter-social-twitter:1.1.0.RELEASE")
+    // WebSockets
     compile("org.springframework.boot:spring-boot-starter-websocket")
+    // Mongo
     compile("org.springframework.data:spring-data-mongodb:1.10.1.RELEASE")
+    // Resources
     compile("org.webjars:webjars-locator")
     compile("org.webjars:sockjs-client:1.0.2")
     compile("org.webjars:stomp-websocket:2.3.3")
     compile("org.webjars:bootstrap:3.3.7")
     compile("org.webjars:jquery:3.1.0")
+    // Text analysis
     compile("io.indico:io.indico:3.14.0")
+    // Message broker
     compile("com.rabbitmq:amqp-client:4.1.0")
+    // Google Core libraries
+    compile("com.google.guava:guava:21.0")
 }
 
 tasks.withType(JavaExec) {
