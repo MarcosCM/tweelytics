@@ -16,8 +16,6 @@ public abstract class AbstractIndicoTextAnalyzer extends AbstractAnalyzer{
 
 	protected Indico indico;
 	
-	protected Map<String, Object> params;
-	
 	/**
 	 * Creates a new text analyzer using the Indico API
 	 * @param apiKey API key given by Indico

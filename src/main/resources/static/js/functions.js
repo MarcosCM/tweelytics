@@ -10,11 +10,19 @@ var analyticsResults = {};
 var searchFilters = null;
 var total = {};
 var normalized = {};
+var configParamsNumber = 1;
+var configForm = null;
+var configParams = null;
+var configAddParamBtn = null;
 
 $(document).ready(function() {
 	qTextInput = $('input#q');
 	searchFilters = $(".search-filter input");
+	configFilters = $(".config-filter input");
 	resultsBlock = $("#resultsBlock");
+	configForm = $('#config');
+	configParams = $('.config-params');
+	configAddParamBtn = $('#configAddParam');
 	$("[id$='Results']").each(function(idx){
 		var id = $(this).attr('id');
 		analyticsResults[id] = $(this);
@@ -22,7 +30,46 @@ $(document).ready(function() {
     // Create websocket
     connectWebSocket();
 	registerSearch();
+	registerConfig();
 });
+
+function registerConfig() {
+	configAddParamBtn.click(function(){
+		var content = '<div class="col-xs-12">'
+	        		+ '		<label for="param'+configParamsNumber+'_id">Parameter name</label><input type="text" name="param'+configParamsNumber+'_id" data-param-id="'+configParamsNumber+'" value="">'
+	        		+ '</div>'
+	        		+ '<div class="col-xs-12">'
+	        		+ '		<label for="param'+configParamsNumber+'_val">Parameter value</label><input type="text" name="param'+configParamsNumber+'_val" value="">'
+	        		+ '</div>'
+	        		+ '<div class="col-xs-12">'
+	        		+ '		<label for="param'+configParamsNumber+'_type">Parameter type (string|int|float|double|boolean)</label><input type="text" name="param'+configParamsNumber+'_type" value="">'
+	        		+ '</div>';
+	    configParams.append(content);
+	    configParamsNumber+=1;
+	});
+
+	configForm.submit(function(event){
+		var url = configForm.attr('action')+'/'+$('#config input[name="processor"]:checked').val();
+		var data = {};
+		$('.config-params input[name$="_id"]').each(function(idx){
+			var _ = $(this);
+			var param_label = _.val();
+			// check if input is empty
+			if (param_label){
+				var param_value = $('#config input[name="param'+_.attr('data-param-id')+'_val"]').val();
+				var param_type = $('#config input[name="param'+_.attr('data-param-id')+'_type"]').val();
+				data[param_label] = {};
+				data[param_label]['value'] = param_value;
+				data[param_label]['type'] = param_type;
+			}
+		});
+		console.log(url);
+		console.log(data);
+		$.post(url, data);
+
+		event.preventDefault();
+	});
+}
 
 function registerSearch() {
 	$("#search").submit(function(event){

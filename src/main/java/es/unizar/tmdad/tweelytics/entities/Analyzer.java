@@ -22,4 +22,6 @@ public interface Analyzer {
 	public Map<QueriedTweet, Map<String, Double>> batchAnalysis(List<QueriedTweet> queriedTweets);
 	
 	public String getType();
+	
+	public void configAnalyzer(Map<String, Object> params);
 }
