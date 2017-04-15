@@ -1,0 +1,43 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.2.RELEASE")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'org.springframework.boot'
+
+jar {
+    baseName = 'processor'
+    version = '2017'
+}
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+	// Spring Boot
+	compile("org.springframework.boot:spring-boot-starter-web")
+	// Twitter
+    compile("org.springframework.boot:spring-boot-starter-social-twitter:1.1.0.RELEASE")
+    // Text analysis
+    compile("io.indico:io.indico:3.14.0")
+    // Message broker
+    compile("org.springframework.amqp:spring-rabbit:1.7.1.RELEASE")
+    // Google Core libraries
+    compile("com.google.guava:guava:21.0")
+}
+
+tasks.withType(JavaExec) {
+    if (System.getProperty('DEBUG', 'false') == 'true') {
+        jvmArgs '-Xdebug', '-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=9099'
+    }
+    systemProperties = System.properties
+}

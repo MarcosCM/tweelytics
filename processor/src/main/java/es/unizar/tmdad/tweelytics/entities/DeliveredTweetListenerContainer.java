@@ -1,0 +1,11 @@
+package es.unizar.tmdad.tweelytics.entities;
+
+import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
+import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
+
+public class DeliveredTweetListenerContainer extends SimpleMessageListenerContainer{
+
+	public DeliveredTweetListenerContainer(CachingConnectionFactory connectionFactory){
+		super(connectionFactory);
+	}
+}

@@ -4,8 +4,4 @@
 /.gradle/
 .classpath
 .project
-/.DS_Store
-lab0.iml
-lab0.ipr
-lab0.iws
 /out/
