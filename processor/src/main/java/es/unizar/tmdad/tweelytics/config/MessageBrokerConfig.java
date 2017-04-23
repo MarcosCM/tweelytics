@@ -3,8 +3,6 @@ package es.unizar.tmdad.tweelytics.config;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.FanoutExchange;
 import org.springframework.amqp.core.Queue;
@@ -12,27 +10,28 @@ import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.amqp.support.converter.JsonMessageConverter;
+import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.PropertySource;
 
-import es.unizar.tmdad.tweelytics.domain.AnalyzedTweet;
-import es.unizar.tmdad.tweelytics.domain.QueriedTweet;
 import es.unizar.tmdad.tweelytics.entities.Analyzer;
 import es.unizar.tmdad.tweelytics.entities.DeliveredTweetListenerContainer;
+import es.unizar.tmdad.tweelytics.entities.DeliveredTweetMessageHandler;
 import es.unizar.tmdad.tweelytics.entities.ProcessorConfigListenerContainer;
+import es.unizar.tmdad.tweelytics.entities.ProcessorConfigMessageHandler;
 
 @Configuration
 @PropertySource(value = { "classpath:messagebroker.properties" })
 public class MessageBrokerConfig {
 
-	private static final Logger logger = LoggerFactory.getLogger(MessageBrokerConfig.class);
 	private static final int MAX_QUEUES = 10;
 	
-	public static final boolean DURABLE_QUEUES = false;
+	public static final boolean DURABLE_QUEUES = true;
 	public static final boolean AUTODELETE_QUEUES = true;
 	
 	@Value("${rabbitmq.host}")
@@ -71,7 +70,12 @@ public class MessageBrokerConfig {
 		}
 	};
 	
-	@Bean(name="cachingConnectionFactory")
+	@Bean
+	public MessageConverter jsonMessageConverter(){
+		return new Jackson2JsonMessageConverter();
+	}
+	
+	@Bean
 	public CachingConnectionFactory cachingConnectionFactory(){
 		CachingConnectionFactory connectionFactory = new CachingConnectionFactory(host);
 		connectionFactory.setUsername(user);
@@ -84,15 +88,13 @@ public class MessageBrokerConfig {
 		return connectionFactory;
 	}
 	
-	@Bean(name="rabbitAdmin")
-	@DependsOn("cachingConnectionFactory")
+	@Bean
 	public RabbitAdmin rabbitAdmin(){
 		CachingConnectionFactory connectionFactory = cachingConnectionFactory();
 		return new RabbitAdmin(connectionFactory);
 	}
 	
-	@Bean(name="rabbitTemplate")
-	@DependsOn("rabbitAdmin")
+	@Bean
 	public RabbitTemplate rabbitTemplate(){
 		CachingConnectionFactory connectionFactory = cachingConnectionFactory();
 		RabbitAdmin rabbitAdmin = rabbitAdmin();
@@ -101,39 +103,23 @@ public class MessageBrokerConfig {
 		Queue processorConfigQueue = new Queue(processorConfigQueueName);
 		rabbitAdmin.declareQueue(deliveredTweetQueue);
 		rabbitAdmin.declareQueue(processorConfigQueue);
-		BindingBuilder.bind(deliveredTweetQueue).to(toProcessorsExchange);
-		BindingBuilder.bind(processorConfigQueue).to(toProcessorsExchange);
+		rabbitAdmin.declareBinding(BindingBuilder.bind(deliveredTweetQueue).to(toProcessorsExchange));
+		rabbitAdmin.declareBinding(BindingBuilder.bind(processorConfigQueue).to(toProcessorsExchange));
 		
-		return new RabbitTemplate(connectionFactory);
+		RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
+		rabbitTemplate.setMessageConverter(jsonMessageConverter());
+		
+		return rabbitTemplate;
 	}
 	
 	@Bean
-	@DependsOn("rabbitTemplate")
 	public DeliveredTweetListenerContainer deliveredTweetListenerContainer(){
 		CachingConnectionFactory connectionFactory = cachingConnectionFactory();
 		RabbitTemplate rabbitTemplate = rabbitTemplate();
 		
 		DeliveredTweetListenerContainer container = new DeliveredTweetListenerContainer(connectionFactory);
-		Object listener = new Object() {
-			public void handleMessage(QueriedTweet queriedTweet) {
-				Map<String, Double> res = null;
-				try {
-					res = analyzer.singleAnalysis(queriedTweet);
-				} catch (Exception e) {
-					logger.info(e.getMessage());
-				}
-				
-				AnalyzedTweet analyzedTweet = new AnalyzedTweet();
-				analyzedTweet.setQueriedTweet(queriedTweet);
-				analyzedTweet.setAnalyticsResults(res);
-				analyzedTweet.setAnalyzedBy(System.getProperty("analyzer"));
-				
-				rabbitTemplate.convertAndSend(toChooserExchangeName, analyzedTweet.getQueriedTweet().getMyQuery(), analyzedTweet);
-			}
-		};
 		
-		MessageListenerAdapter adapter = new MessageListenerAdapter(listener);
-		container.setMessageListener(adapter);
+		container.setMessageListener(new MessageListenerAdapter(new DeliveredTweetMessageHandler(rabbitTemplate, toChooserExchangeName, analyzer), jsonMessageConverter()));
 		container.setQueueNames(deliveredTweetQueueName);
 		container.start();
 		
@@ -141,19 +127,12 @@ public class MessageBrokerConfig {
 	}
 	
 	@Bean
-	@DependsOn("rabbitTemplate")
 	public ProcessorConfigListenerContainer processorConfigListenerContainer(){
 		CachingConnectionFactory connectionFactory = cachingConnectionFactory();
 		
 		ProcessorConfigListenerContainer container = new ProcessorConfigListenerContainer(connectionFactory);
-		Object listener = new Object() {
-			public void handleMessage(Map<String, Object> params) {
-				analyzer.configAnalyzer(params);
-			}
-		};
 		
-		MessageListenerAdapter adapter = new MessageListenerAdapter(listener);
-		container.setMessageListener(adapter);
+		container.setMessageListener(new MessageListenerAdapter(new ProcessorConfigMessageHandler(analyzer), jsonMessageConverter()));
 		container.setQueueNames(processorConfigQueueName);
 		container.start();
 		

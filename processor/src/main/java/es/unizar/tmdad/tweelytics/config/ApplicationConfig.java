@@ -28,6 +28,7 @@ public class ApplicationConfig {
 	
 	@Bean
 	public Analyzer analyzer(){
+		logger.info(System.getProperty("analyzer"));
 		// Emotion
 		if (System.getProperty("analyzer").equals("Emotion")){
 			if (Boolean.parseBoolean(analyzersMock)) return new MockEmotionAnalyzer();

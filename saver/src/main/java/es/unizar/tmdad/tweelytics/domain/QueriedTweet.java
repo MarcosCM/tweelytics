@@ -9,16 +9,19 @@ import org.springframework.social.twitter.api.TwitterProfile;
 
 public class QueriedTweet {
 
-	private Tweet tweet;
+	private CustomTweet customTweet;
 	private String myQuery;
 	private String text;
 
+	public QueriedTweet(){}
+	
 	public QueriedTweet(Tweet tweet) {
-		this.tweet = tweet;
+		this.customTweet = new CustomTweet(tweet);
 	}
 	
 	public QueriedTweet(Tweet tweet, String myQuery) {
-		this.tweet = tweet;
+		this.customTweet = new CustomTweet(tweet.getId(), String.valueOf(tweet.getId()), tweet.getText(), tweet.getCreatedAt(),
+				tweet.getFromUser(), tweet.getProfileImageUrl(), tweet.getToUserId(), tweet.getFromUserId(), tweet.getLanguageCode(), tweet.getSource());
 		this.myQuery = myQuery;
 		this.text = tweet.getText().replaceAll("(?i)("+myQuery+")", "<strong>$1</strong>");
 	}
@@ -32,11 +35,11 @@ public class QueriedTweet {
 	}
 	
 	public Map<String, Object> getExtraData() {
-		return tweet.getExtraData();
+		return customTweet.getExtraData();
 	}
 
 	public String getOriginalText() {
-		return tweet.getText();
+		return customTweet.getText();
 	}
 	
 	public void setText(String text) {
@@ -44,186 +47,163 @@ public class QueriedTweet {
 	}
 
 	public String getText() {
-		return text != null ? text : tweet.getUnmodifiedText();
+		return text != null ? text : customTweet.getText();
 	}
 
 	public Date getCreatedAt() {
-		return tweet.getCreatedAt();
+		return customTweet.getCreatedAt();
 	}
 
 	public String getFromUser() {
-		return tweet.getFromUser();
+		return customTweet.getFromUser();
 	}
 
 	public void setFromUser(String fromUser) {
-		tweet.setFromUser(fromUser);
+		customTweet.setFromUser(fromUser);
 	}
 
 	public long getId() {
-		return tweet.getId();
+		return customTweet.getId();
 	}
 
 	public String getProfileImageUrl() {
-		return tweet.getProfileImageUrl();
+		return customTweet.getProfileImageUrl();
 	}
 
 	public void setProfileImageUrl(String profileImageUrl) {
-		tweet.setProfileImageUrl(profileImageUrl);
+		customTweet.setProfileImageUrl(profileImageUrl);
 	}
 
 	public Long getToUserId() {
-		return tweet.getToUserId();
+		return customTweet.getToUserId();
 	}
 
 	public void setToUserId(Long toUserId) {
-		tweet.setToUserId(toUserId);
+		customTweet.setToUserId(toUserId);
 	}
 
 	public long getFromUserId() {
-		return tweet.getFromUserId();
+		return customTweet.getFromUserId();
 	}
 
 	public void setInReplyToStatusId(Long inReplyToStatusId) {
-		tweet.setInReplyToStatusId(inReplyToStatusId);
+		customTweet.setInReplyToStatusId(inReplyToStatusId);
 	}
 
 	public Long getInReplyToStatusId() {
-		return tweet.getInReplyToStatusId();
+		return customTweet.getInReplyToStatusId();
 	}
 
 	public void setFromUserId(long fromUserId) {
-		tweet.setFromUserId(fromUserId);
+		customTweet.setFromUserId(fromUserId);
 	}
 
 	public String getLanguageCode() {
-		return tweet.getLanguageCode();
+		return customTweet.getLanguageCode();
 	}
 
 	public void setLanguageCode(String languageCode) {
-		tweet.setLanguageCode(languageCode);
+		customTweet.setLanguageCode(languageCode);
 	}
 
 	public String getSource() {
-		return tweet.getSource();
+		return customTweet.getSource();
 	}
 
 	public void setSource(String source) {
-		tweet.setSource(source);
+		customTweet.setSource(source);
 	}
 
 	public void setRetweetCount(Integer retweetCount) {
-		tweet.setRetweetCount(retweetCount);
+		customTweet.setRetweetCount(retweetCount);
 	}
 
 	public Integer getRetweetCount() {
-		return tweet.getRetweetCount();
+		return customTweet.getRetweetCount();
 	}
 
 	public void setRetweeted(boolean retweeted) {
-		tweet.setRetweeted(retweeted);
+		customTweet.setRetweeted(retweeted);
 	}
 
 	public boolean isRetweeted() {
-		return tweet.isRetweeted();
-	}
-
-	public Tweet getRetweetedStatus() {
-		return tweet.getRetweetedStatus();
-	}
-
-	public void setRetweetedStatus(Tweet tweet) {
-		tweet.setRetweetedStatus(tweet);
-	}
-
-	public boolean isRetweet() {
-		return tweet.isRetweet();
+		return customTweet.isRetweeted();
 	}
 
 	public void setFavorited(boolean favorited) {
-		tweet.setFavorited(favorited);
+		customTweet.setFavorited(favorited);
 	}
 
 	public boolean isFavorited() {
-		return tweet.isFavorited();
+		return customTweet.isFavorited();
 	}
 
 	public void setFavoriteCount(Integer favoriteCount) {
-		tweet.setFavoriteCount(favoriteCount);
+		customTweet.setFavoriteCount(favoriteCount);
 	}
 
 	public Integer getFavoriteCount() {
-		return tweet.getFavoriteCount();
+		return customTweet.getFavoriteCount();
 	}
 
 	public Entities getEntities() {
-		return tweet.getEntities();
+		return customTweet.getEntities();
 	}
 
 	public void setEntities(Entities ent) {
-		tweet.setEntities(ent);
-	}
-
-	public boolean hasMentions() {
-		return tweet.hasMentions();
-	}
-
-	public boolean hasMedia() {
-		return tweet.hasMedia();
-	}
-
-	public boolean hasUrls() {
-		return tweet.hasUrls();
-	}
-
-	public boolean hasTags() {
-		return tweet.hasTags();
+		customTweet.setEntities(ent);
 	}
 
 	public TwitterProfile getUser() {
-		return tweet.getUser();
+		return customTweet.getUser();
 	}
 
 	public void setUser(TwitterProfile prof) {
-		tweet.setUser(prof);
+		customTweet.setUser(prof);
 	}
 
 	public Long getInReplyToUserId() {
-		return tweet.getInReplyToUserId();
+		return customTweet.getInReplyToUserId();
 	}
 
 	public void setInReplyToUserId(Long inReplyToUserId) {
-		tweet.setInReplyToUserId(inReplyToUserId);
+		customTweet.setInReplyToUserId(inReplyToUserId);
 	}
 
 	public String getInReplyToScreenName() {
-		return tweet.getInReplyToScreenName();
+		return customTweet.getInReplyToScreenName();
 	}
 
 	public void setInReplyToScreenName(String inReplyToScreenName) {
-		tweet.setInReplyToScreenName(inReplyToScreenName);
+		customTweet.setInReplyToScreenName(inReplyToScreenName);
 	}
 
 	@Override
 	public boolean equals(Object o) {
-		return tweet.equals(o);
+		return customTweet.equals(o);
 	}
 
 	@Override
 	public int hashCode() {
-		return tweet.hashCode();
+		return customTweet.hashCode();
 	}
 
 	@Override
 	public String toString() {
-		return tweet.toString();
+		return customTweet.toString();
 	}
 
-	public Tweet getTweet() {
-		return tweet;
+	public CustomTweet getCustomTweet() {
+		return customTweet;
+	}
+	
+	public void setCustomTweet(CustomTweet customTweet){
+		this.customTweet = customTweet;
 	}
 
 	public void setTweet(Tweet tweet) {
-		this.tweet = tweet;
+		this.customTweet = new CustomTweet(tweet.getId(), String.valueOf(tweet.getId()), tweet.getText(), tweet.getCreatedAt(),
+				tweet.getFromUser(), tweet.getProfileImageUrl(), tweet.getToUserId(), tweet.getFromUserId(), tweet.getLanguageCode(), tweet.getSource());
 	}
 	
 }

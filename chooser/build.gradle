@@ -47,6 +47,7 @@ dependencies {
     compile("org.webjars:jquery:3.1.0")
     // Message broker
     compile("org.springframework.amqp:spring-rabbit:1.7.1.RELEASE")
+    compile("org.codehaus.jackson:jackson-mapper-asl:1.9.13")
     // Google Core libraries
     compile("com.google.guava:guava:21.0")
 }
