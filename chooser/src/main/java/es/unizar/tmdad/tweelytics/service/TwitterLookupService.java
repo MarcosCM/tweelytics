@@ -55,6 +55,9 @@ public class TwitterLookupService {
 	@Value("${rabbitmq.toChooserExchangeName}")
 	private String toChooserExchangeName;
 	
+	@Value("${rabbitmq.toChooserQueueName}")
+	private String toChooserQueueName;
+	
 	private static final int MAX_STREAMS = 10;
 	
 	// Queried streams
@@ -77,9 +80,9 @@ public class TwitterLookupService {
 				.filter(fsp, l));
 		
 		DirectExchange toChooserExchange = new DirectExchange(toChooserExchangeName, MessageBrokerConfig.DURABLE_QUEUES, MessageBrokerConfig.AUTODELETE_QUEUES);
-		Queue queryQueue = new Queue(query);
+		Queue queryQueue = new Queue(toChooserQueueName+query);
 		rabbitAdmin.declareQueue(queryQueue);
 		rabbitAdmin.declareBinding(BindingBuilder.bind(queryQueue).to(toChooserExchange).with(query));
-		analyzedTweetListenerContainer.addQueueNames(query);
+		analyzedTweetListenerContainer.addQueueNames(toChooserQueueName+query);
     }
 }

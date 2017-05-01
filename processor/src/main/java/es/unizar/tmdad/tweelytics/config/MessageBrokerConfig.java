@@ -102,8 +102,8 @@ public class MessageBrokerConfig {
 		RabbitAdmin rabbitAdmin = rabbitAdmin();
 		FanoutExchange toProcessorsTweetExchange = new FanoutExchange(toProcessorsTweetExchangeName, DURABLE_QUEUES, AUTODELETE_QUEUES);
 		FanoutExchange toProcessorsConfigExchange = new FanoutExchange(toProcessorsConfigExchangeName, DURABLE_QUEUES, AUTODELETE_QUEUES);
-		Queue deliveredTweetQueue = new Queue(deliveredTweetQueueName);
-		Queue processorConfigQueue = new Queue(processorConfigQueueName);
+		Queue deliveredTweetQueue = new Queue(deliveredTweetQueueName+System.getProperty("analyzer"));
+		Queue processorConfigQueue = new Queue(processorConfigQueueName+System.getProperty("analyzer"));
 		rabbitAdmin.declareQueue(deliveredTweetQueue);
 		rabbitAdmin.declareQueue(processorConfigQueue);
 		rabbitAdmin.declareBinding(BindingBuilder.bind(deliveredTweetQueue).to(toProcessorsTweetExchange));
@@ -123,7 +123,7 @@ public class MessageBrokerConfig {
 		DeliveredTweetListenerContainer container = new DeliveredTweetListenerContainer(connectionFactory);
 		
 		container.setMessageListener(new MessageListenerAdapter(new DeliveredTweetMessageHandler(rabbitTemplate, toChooserExchangeName, analyzer), jsonMessageConverter()));
-		container.setQueueNames(deliveredTweetQueueName);
+		container.setQueueNames(deliveredTweetQueueName+System.getProperty("analyzer"));
 		container.start();
 		
 		return container;
@@ -136,7 +136,7 @@ public class MessageBrokerConfig {
 		ProcessorConfigListenerContainer container = new ProcessorConfigListenerContainer(connectionFactory);
 		
 		container.setMessageListener(new MessageListenerAdapter(new ProcessorConfigMessageHandler(analyzer), jsonMessageConverter()));
-		container.setQueueNames(processorConfigQueueName);
+		container.setQueueNames(processorConfigQueueName+System.getProperty("analyzer"));
 		container.start();
 		
 		return container;
