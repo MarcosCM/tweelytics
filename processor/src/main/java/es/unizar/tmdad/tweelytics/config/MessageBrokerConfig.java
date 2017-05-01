@@ -45,8 +45,11 @@ public class MessageBrokerConfig {
 	@Value("${rabbitmq.vhost}")
 	private String vhost;
 	
-	@Value("${rabbitmq.toProcessorsExchangeName}")
-	private String toProcessorsExchangeName;
+	@Value("${rabbitmq.toProcessorsTweetExchangeName}")
+	private String toProcessorsTweetExchangeName;
+	
+	@Value("${rabbitmq.toProcessorsConfigExchangeName}")
+	private String toProcessorsConfigExchangeName;
 	
 	@Value("${rabbitmq.toChooserExchangeName}")
 	private String toChooserExchangeName;
@@ -97,13 +100,14 @@ public class MessageBrokerConfig {
 	public RabbitTemplate rabbitTemplate(){
 		CachingConnectionFactory connectionFactory = cachingConnectionFactory();
 		RabbitAdmin rabbitAdmin = rabbitAdmin();
-		FanoutExchange toProcessorsExchange = new FanoutExchange(toProcessorsExchangeName, DURABLE_QUEUES, AUTODELETE_QUEUES);
+		FanoutExchange toProcessorsTweetExchange = new FanoutExchange(toProcessorsTweetExchangeName, DURABLE_QUEUES, AUTODELETE_QUEUES);
+		FanoutExchange toProcessorsConfigExchange = new FanoutExchange(toProcessorsConfigExchangeName, DURABLE_QUEUES, AUTODELETE_QUEUES);
 		Queue deliveredTweetQueue = new Queue(deliveredTweetQueueName);
 		Queue processorConfigQueue = new Queue(processorConfigQueueName);
 		rabbitAdmin.declareQueue(deliveredTweetQueue);
 		rabbitAdmin.declareQueue(processorConfigQueue);
-		rabbitAdmin.declareBinding(BindingBuilder.bind(deliveredTweetQueue).to(toProcessorsExchange));
-		rabbitAdmin.declareBinding(BindingBuilder.bind(processorConfigQueue).to(toProcessorsExchange));
+		rabbitAdmin.declareBinding(BindingBuilder.bind(deliveredTweetQueue).to(toProcessorsTweetExchange));
+		rabbitAdmin.declareBinding(BindingBuilder.bind(processorConfigQueue).to(toProcessorsConfigExchange));
 		
 		RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
 		rabbitTemplate.setMessageConverter(jsonMessageConverter());

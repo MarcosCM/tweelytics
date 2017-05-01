@@ -1,15 +1,11 @@
 package es.unizar.tmdad.tweelytics.config;
 
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.FanoutExchange;
-import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
-import org.springframework.amqp.support.converter.JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,15 +37,6 @@ public class MessageBrokerConfig {
 	@Value("${rabbitmq.vhost}")
 	private String vhost;
 	
-	@Value("${rabbitmq.toProcessorsExchangeName}")
-	private String toProcessorsExchangeName;
-	
-	@Value("${rabbitmq.deliveredTweetQueueName}")
-	private String deliveredTweetQueueName;
-	
-	@Value("${rabbitmq.processorConfigQueueName}")
-	private String processorConfigQueueName;
-	
 	@Autowired
 	private SimpMessageSendingOperations messageSendingOperations;
 	
@@ -71,7 +58,6 @@ public class MessageBrokerConfig {
 		return connectionFactory;
 	}
 	
-	
 	@Bean
 	public RabbitAdmin rabbitAdmin(){
 		CachingConnectionFactory connectionFactory = cachingConnectionFactory();
@@ -81,14 +67,6 @@ public class MessageBrokerConfig {
 	@Bean
 	public RabbitTemplate rabbitTemplate(){
 		CachingConnectionFactory connectionFactory = cachingConnectionFactory();
-		RabbitAdmin rabbitAdmin = rabbitAdmin();
-		FanoutExchange toProcessorsExchange = new FanoutExchange(toProcessorsExchangeName, DURABLE_QUEUES, AUTODELETE_QUEUES);
-		Queue deliveredTweetQueue = new Queue(deliveredTweetQueueName);
-		Queue processorConfigQueue = new Queue(processorConfigQueueName);
-		rabbitAdmin.declareQueue(deliveredTweetQueue);
-		rabbitAdmin.declareQueue(processorConfigQueue);
-		rabbitAdmin.declareBinding(BindingBuilder.bind(deliveredTweetQueue).to(toProcessorsExchange));
-		rabbitAdmin.declareBinding(BindingBuilder.bind(processorConfigQueue).to(toProcessorsExchange));
 		
 		RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
 		rabbitTemplate.setMessageConverter(jsonMessageConverter());

@@ -14,11 +14,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class ProcessorController {
 	
-	@Value("${rabbitmq.toProcessorsExchangeName}")
-	private String toProcessorsExchangeName;
-	
-	@Value("${rabbitmq.processorConfigQueueName}")
-	private String processorConfigQueueName;
+	@Value("${rabbitmq.toProcessorsConfigExchangeName}")
+	private String toProcessorsConfigExchangeName;
 	
 	@Autowired
 	private RabbitTemplate rabbitTemplate;
@@ -39,6 +36,6 @@ public class ProcessorController {
 				else parsedParams.put(newK, params.get(value).toString());
 			});
 		// send message to processors
-		rabbitTemplate.convertAndSend(toProcessorsExchangeName, processorConfigQueueName, parsedParams);
+		rabbitTemplate.convertAndSend(toProcessorsConfigExchangeName, "", parsedParams);
     }
 }

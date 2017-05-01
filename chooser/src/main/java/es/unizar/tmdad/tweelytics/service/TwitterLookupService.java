@@ -5,6 +5,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.DirectExchange;
+import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +18,8 @@ import org.springframework.social.twitter.api.StreamListener;
 import org.springframework.social.twitter.api.impl.TwitterTemplate;
 import org.springframework.stereotype.Service;
 
+import es.unizar.tmdad.tweelytics.config.MessageBrokerConfig;
+import es.unizar.tmdad.tweelytics.entities.AnalyzedTweetListenerContainer;
 import es.unizar.tmdad.tweelytics.service.SimpleStreamListener;
 
 @Service
@@ -24,6 +30,12 @@ public class TwitterLookupService {
 	
 	@Autowired
 	private RabbitTemplate rabbitTemplate;
+	
+	@Autowired
+	private AnalyzedTweetListenerContainer analyzedTweetListenerContainer;
+	
+	@Autowired
+	private RabbitAdmin rabbitAdmin;
 	
 	@Value("${twitter.consumerKey}")
 	private String consumerKey;
@@ -37,8 +49,11 @@ public class TwitterLookupService {
 	@Value("${twitter.accessTokenSecret}")
 	private String accessTokenSecret;
 	
-	@Value("${rabbitmq.toProcessorsExchangeName}")
-	private String toProcessorsExchangeName;
+	@Value("${rabbitmq.toProcessorsTweetExchangeName}")
+	private String toProcessorsTweetExchangeName;
+	
+	@Value("${rabbitmq.toChooserExchangeName}")
+	private String toChooserExchangeName;
 	
 	private static final int MAX_STREAMS = 10;
 	
@@ -56,9 +71,15 @@ public class TwitterLookupService {
 		fsp.track(query);
 		
 		List<StreamListener> l = new ArrayList<StreamListener>();
-		l.add(new SimpleStreamListener(query, rabbitTemplate, toProcessorsExchangeName));
+		l.add(new SimpleStreamListener(query, rabbitTemplate, toProcessorsTweetExchangeName));
 		
 		streams.putIfAbsent(query, twitterTemplate.streamingOperations()
 				.filter(fsp, l));
+		
+		DirectExchange toChooserExchange = new DirectExchange(toChooserExchangeName, MessageBrokerConfig.DURABLE_QUEUES, MessageBrokerConfig.AUTODELETE_QUEUES);
+		Queue queryQueue = new Queue(query);
+		rabbitAdmin.declareQueue(queryQueue);
+		rabbitAdmin.declareBinding(BindingBuilder.bind(queryQueue).to(toChooserExchange).with(query));
+		analyzedTweetListenerContainer.addQueueNames(query);
     }
 }

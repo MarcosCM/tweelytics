@@ -38,6 +38,6 @@ public class DeliveredTweetMessageHandler {
 		analyzedTweet.setAnalyticsResults(res);
 		analyzedTweet.setAnalyzedBy(System.getProperty("analyzer"));
 		
-		rabbitTemplate.convertAndSend(toChooserExchangeName, analyzedTweet.getQueriedTweet().getMyQuery(), analyzedTweet);
+		rabbitTemplate.convertAndSend(toChooserExchangeName, queriedTweet.getMyQuery(), analyzedTweet);
 	}
 }

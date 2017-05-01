@@ -36,7 +36,7 @@ public class SimpleStreamListener implements StreamListener {
 
 	@Override
 	public void onTweet(Tweet tweet) {
-		logger.info("Received tweet from query "+ query +": " + tweet.getText());
+		logger.info("Received tweet from query "+ query);
 		
 		QueriedTweet queriedTweet = new QueriedTweet(tweet, query);
 		
