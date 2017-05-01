@@ -3,18 +3,17 @@ package es.unizar.tmdad.tweelytics.entities;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 
 import es.unizar.tmdad.tweelytics.domain.QueriedTweet;
-import es.unizar.tmdad.tweelytics.repository.TweetRepository;
 
 public class QueriedTweetMessageHandler {
 	
-	private TweetRepository tweetRepository;
+	private TweetSaver tweetSaver;
 	
-	public QueriedTweetMessageHandler(TweetRepository tweetRepository){
-		this.tweetRepository = tweetRepository;
+	public QueriedTweetMessageHandler(TweetSaver tweetSaver){
+		this.tweetSaver = tweetSaver;
 	}
 	
 	@RabbitListener
 	public void handleMessage(QueriedTweet queriedTweet) {
-		tweetRepository.save(queriedTweet);
+		tweetSaver.save(queriedTweet);
 	}
 }

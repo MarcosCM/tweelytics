@@ -21,7 +21,7 @@ import org.springframework.context.annotation.PropertySource;
 
 import es.unizar.tmdad.tweelytics.entities.DeliveredTweetListenerContainer;
 import es.unizar.tmdad.tweelytics.entities.QueriedTweetMessageHandler;
-import es.unizar.tmdad.tweelytics.repository.TweetRepository;
+import es.unizar.tmdad.tweelytics.entities.TweetSaver;
 
 @Configuration
 @EnableRabbit
@@ -52,7 +52,7 @@ public class MessageBrokerConfig {
 	private String toSaverQueueName;
 	
 	@Autowired
-	private TweetRepository tweetRepository;
+	private TweetSaver tweetSaver;
 	
 	// Queried streams
 	// LinkedHashMap to guarantee FIFO replacement when max number of streams is reached (insertion-ordered)
@@ -108,7 +108,7 @@ public class MessageBrokerConfig {
 		CachingConnectionFactory connectionFactory = cachingConnectionFactory();
 		
 		DeliveredTweetListenerContainer container = new DeliveredTweetListenerContainer(connectionFactory);
-		container.setMessageListener(new MessageListenerAdapter(new QueriedTweetMessageHandler(tweetRepository), jsonMessageConverter()));
+		container.setMessageListener(new MessageListenerAdapter(new QueriedTweetMessageHandler(tweetSaver), jsonMessageConverter()));
 		container.setQueueNames(toSaverQueueName);
 		container.start();
 		
