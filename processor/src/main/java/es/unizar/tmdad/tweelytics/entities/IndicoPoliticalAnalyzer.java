@@ -33,7 +33,7 @@ public class IndicoPoliticalAnalyzer extends AbstractIndicoTextAnalyzer implemen
 		
 		List<Map<PoliticalClass, Double>> politicalClassResult = null;
 		try {
-			politicalClassResult = indicoApiBatchTextAnalysis(queriedTweets, this.params).getPolitical();
+			politicalClassResult = indicoApiBatchTextAnalysis(queriedTweets, this.getComponentConfig().getParams()).getPolitical();
 		} catch (IndicoException | IOException e) {
 			logger.info(e.getMessage());
 			return null;

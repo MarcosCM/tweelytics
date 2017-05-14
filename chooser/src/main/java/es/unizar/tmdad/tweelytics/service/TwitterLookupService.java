@@ -84,7 +84,7 @@ public class TwitterLookupService {
 		fsp.track(query);
 		
 		List<StreamListener> l = new ArrayList<StreamListener>();
-		l.add(new SimpleStreamListener(query, rabbitTemplate, toProcessorsTweetExchangeName, config.getParams().get("highlightMode")));
+		l.add(new SimpleStreamListener(query, rabbitTemplate, toProcessorsTweetExchangeName, config.getParams().get("highlightMode").toString()));
 		
 		streams.putIfAbsent(query, twitterTemplate.streamingOperations()
 				.filter(fsp, l));
@@ -109,7 +109,7 @@ public class TwitterLookupService {
 				config = new ComponentConfig();
 			}
 		}
-		if (config.getParams() == null) config.setParams(new HashMap<String, String>());
+		if (config.getParams() == null) config.setParams(new HashMap<String, Object>());
 		if (config.getComponent() == null) config.setComponent("chooser");
 		if (config.getParams().get("highlightMode") == null) config.setParam("highlightMode", "<strong>$1</strong>");
 	}

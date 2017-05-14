@@ -1,7 +1,6 @@
 package es.unizar.tmdad.tweelytics.entities;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -23,8 +22,8 @@ public abstract class AbstractIndicoTextAnalyzer extends AbstractAnalyzer{
 	 */
 	public AbstractIndicoTextAnalyzer(String apiKey, Api[] indicoQueriedApis) throws IndicoException{
 		this.indico = new Indico(apiKey);
-		this.params = new HashMap<String, Object>();
-		this.params.put("apis", indicoQueriedApis);
+		fillComponentConfig();
+		this.getComponentConfig().getParams().put("apis", indicoQueriedApis);
 	}
 	
 	/**

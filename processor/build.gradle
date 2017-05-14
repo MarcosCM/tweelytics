@@ -27,6 +27,8 @@ dependencies {
 	compile("org.springframework.boot:spring-boot-starter-web")
 	// Twitter
     compile("org.springframework.boot:spring-boot-starter-social-twitter:1.1.0.RELEASE")
+    // Mongo
+    compile("org.springframework.data:spring-data-mongodb:1.10.1.RELEASE")
     // Text analysis
     compile("io.indico:io.indico:3.14.0")
     // Message broker

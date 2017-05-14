@@ -35,7 +35,7 @@ public class IndicoEmotionAnalyzer extends AbstractIndicoTextAnalyzer implements
 		
 		List<Map<Emotion, Double>> emotionResult = null;
 		try {
-			emotionResult = indicoApiBatchTextAnalysis(queriedTweets, this.params).getEmotion();
+			emotionResult = indicoApiBatchTextAnalysis(queriedTweets, this.getComponentConfig().getParams()).getEmotion();
 		} catch (IndicoException | IOException e) {
 			logger.info(e.getMessage());
 			return null;

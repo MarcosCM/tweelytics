@@ -32,7 +32,7 @@ public class IndicoTwitterEngagementAnalyzer extends AbstractIndicoTextAnalyzer 
 		
 		List<Double> twitterEngagementResult = null;
 		try {
-			twitterEngagementResult = indicoApiBatchTextAnalysis(queriedTweets, this.params).getTwitterEngagement();
+			twitterEngagementResult = indicoApiBatchTextAnalysis(queriedTweets, this.getComponentConfig().getParams()).getTwitterEngagement();
 		} catch (IndicoException | IOException e) {
 			logger.info(e.getMessage());
 			return null;
