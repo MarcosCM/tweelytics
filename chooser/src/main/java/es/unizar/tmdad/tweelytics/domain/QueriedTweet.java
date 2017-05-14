@@ -19,11 +19,11 @@ public class QueriedTweet {
 		this.customTweet = new CustomTweet(tweet);
 	}
 	
-	public QueriedTweet(Tweet tweet, String myQuery) {
+	public QueriedTweet(Tweet tweet, String myQuery, String highlightMode) {
 		this.customTweet = new CustomTweet(tweet.getId(), String.valueOf(tweet.getId()), tweet.getText(), tweet.getCreatedAt(),
 				tweet.getFromUser(), tweet.getProfileImageUrl(), tweet.getToUserId(), tweet.getFromUserId(), tweet.getLanguageCode(), tweet.getSource());
 		this.myQuery = myQuery;
-		this.text = tweet.getText().replaceAll("(?i)("+myQuery+")", "<strong>$1</strong>");
+		this.text = tweet.getText().replaceAll("(?i)("+myQuery+")", highlightMode);
 	}
 	
 	public String getMyQuery(){

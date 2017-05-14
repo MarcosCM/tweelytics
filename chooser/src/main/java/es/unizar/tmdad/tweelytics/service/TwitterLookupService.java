@@ -19,11 +19,16 @@ import org.springframework.social.twitter.api.impl.TwitterTemplate;
 import org.springframework.stereotype.Service;
 
 import es.unizar.tmdad.tweelytics.config.MessageBrokerConfig;
+import es.unizar.tmdad.tweelytics.domain.ComponentConfig;
 import es.unizar.tmdad.tweelytics.entities.AnalyzedTweetListenerContainer;
+import es.unizar.tmdad.tweelytics.repository.ConfigsRepository;
 import es.unizar.tmdad.tweelytics.service.SimpleStreamListener;
 
 @Service
 public class TwitterLookupService {
+	
+	@Autowired
+	private ConfigsRepository configsRepository;
 	
 	@Autowired
 	private TwitterTemplate twitterTemplate;
@@ -57,6 +62,8 @@ public class TwitterLookupService {
 	
 	@Value("${rabbitmq.toChooserQueueName}")
 	private String toChooserQueueName;
+
+	private ComponentConfig config;
 	
 	private static final int MAX_STREAMS = 10;
 	
@@ -70,11 +77,13 @@ public class TwitterLookupService {
 	};
 	
 	public void search(String query) {
+		fillComponentConfig();
+		
 		FilterStreamParameters fsp = new FilterStreamParameters();
 		fsp.track(query);
 		
 		List<StreamListener> l = new ArrayList<StreamListener>();
-		l.add(new SimpleStreamListener(query, rabbitTemplate, toProcessorsTweetExchangeName));
+		l.add(new SimpleStreamListener(query, rabbitTemplate, toProcessorsTweetExchangeName, config.getParams().get("highlightMode")));
 		
 		streams.putIfAbsent(query, twitterTemplate.streamingOperations()
 				.filter(fsp, l));
@@ -85,4 +94,18 @@ public class TwitterLookupService {
 		rabbitAdmin.declareBinding(BindingBuilder.bind(queryQueue).to(toChooserExchange).with(query));
 		analyzedTweetListenerContainer.addQueueNames(toChooserQueueName+query);
     }
+	
+	public void setParam(String key, String value){
+		fillComponentConfig();
+		config.getParams().put(key, value);
+	}
+	
+	private void fillComponentConfig(){
+		if (config == null){
+			config = configsRepository.findByComponent("chooser");
+			if (config == null) config = new ComponentConfig();
+		}
+		
+		if (config.getParams().get("highlightMode") == null) config.setParam("highlightMode", "<strong>$1</strong>");
+	}
 }

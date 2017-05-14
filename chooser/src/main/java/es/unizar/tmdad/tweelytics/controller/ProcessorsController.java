@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
-public class ProcessorController {
+public class ProcessorsController {
 	
 	@Value("${rabbitmq.toProcessorsConfigExchangeName}")
 	private String toProcessorsConfigExchangeName;
@@ -20,8 +20,8 @@ public class ProcessorController {
 	@Autowired
 	private RabbitTemplate rabbitTemplate;
 	
-	@RequestMapping(value = "/config", method = RequestMethod.POST)
-    public void configProcessor(@RequestParam Map<String, String> params) {
+	@RequestMapping(value = "/configProcessors", method = RequestMethod.POST)
+    public void configProcessors(@RequestParam Map<String, String> params) {
 		Map<String, Object> parsedParams = new HashMap<String, Object>();
 		// parse to config analyzer format
 		params.keySet().stream()

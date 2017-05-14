@@ -10,18 +10,18 @@ var analyticsResults = {};
 var searchFilters = null;
 var total = {};
 var normalized = {};
-var configParamsNumber = 1;
-var configForm = null;
-var configParams = null;
-var configAddParamBtn = null;
+var configProcessorsParamsNumber = 1;
+var configProcessorsForm = null;
+var configProcessorsParams = null;
+var configProcessorsAddParamBtn = null;
 
 $(document).ready(function() {
 	qTextInput = $('input#q');
 	searchFilters = $(".search-filter input");
 	resultsBlock = $("#resultsBlock");
-	configForm = $('#config');
-	configParams = $('.config-params');
-	configAddParamBtn = $('#configAddParam');
+	configProcessorsForm = $('#configProcessorsProcessors');
+	configProcessorsParams = $('.configProcessors-params');
+	configProcessorsAddParamBtn = $('#configProcessorsProcessorsAddParam');
 	$("[id$='Results']").each(function(idx){
 		var id = $(this).attr('id');
 		analyticsResults[id] = $(this);
@@ -33,30 +33,30 @@ $(document).ready(function() {
 });
 
 function registerConfig() {
-	configAddParamBtn.click(function(){
+	configProcessorsAddParamBtn.click(function(){
 		var content = '<div class="col-xs-12">'
-	        		+ '		<label for="param'+configParamsNumber+'_id">Parameter name</label><input type="text" name="param'+configParamsNumber+'_id" data-param-id="'+configParamsNumber+'" value="">'
+	        		+ '		<label for="param'+configProcessorsParamsNumber+'_id">Parameter name</label><input type="text" name="param'+configProcessorsParamsNumber+'_id" data-param-id="'+configProcessorsParamsNumber+'" value="">'
 	        		+ '</div>'
 	        		+ '<div class="col-xs-12">'
-	        		+ '		<label for="param'+configParamsNumber+'_val">Parameter value</label><input type="text" name="param'+configParamsNumber+'_val" value="">'
+	        		+ '		<label for="param'+configProcessorsParamsNumber+'_val">Parameter value</label><input type="text" name="param'+configProcessorsParamsNumber+'_val" value="">'
 	        		+ '</div>'
 	        		+ '<div class="col-xs-12">'
-	        		+ '		<label for="param'+configParamsNumber+'_type">Parameter type (string|int|float|double|boolean)</label><input type="text" name="param'+configParamsNumber+'_type" value="">'
+	        		+ '		<label for="param'+configProcessorsParamsNumber+'_type">Parameter type (string|int|float|double|boolean)</label><input type="text" name="param'+configProcessorsParamsNumber+'_type" value="">'
 	        		+ '</div>';
-	    configParams.append(content);
-	    configParamsNumber+=1;
+	    configProcessorsParams.append(content);
+	    configProcessorsParamsNumber+=1;
 	});
 
-	configForm.submit(function(event){
-		var url = configForm.attr('action');
+	configProcessorsForm.submit(function(event){
+		var url = configProcessorsForm.attr('action');
 		var data = {};
-		$('.config-params input[name$="_id"]').each(function(idx){
+		$('.configProcessors-params input[name$="_id"]').each(function(idx){
 			var _ = $(this);
 			var param_label = _.val();
 			// check if input is empty
 			if (param_label){
-				var param_value = $('#config input[name="param'+_.attr('data-param-id')+'_val"]').val();
-				var param_type = $('#config input[name="param'+_.attr('data-param-id')+'_type"]').val();
+				var param_value = $('#configProcessors input[name="param'+_.attr('data-param-id')+'_val"]').val();
+				var param_type = $('#configProcessors input[name="param'+_.attr('data-param-id')+'_type"]').val();
 				data[param_label] = {};
 				data[param_label]['value'] = param_value;
 				data[param_label]['type'] = param_type;
