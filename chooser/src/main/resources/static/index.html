@@ -32,6 +32,26 @@
 			</form>
 		</div>
 	</div>
+    <div class="row margin-bottom-5">
+        <form id="configChooser" action="/configChooser" method="POST">
+            <div class="row margin-bottom-2">
+                <div class="col-xs-12 text-center"><h2>Tweet chooser config</h2></div>
+            </div>
+            <div class="row margin-bottom-2 configChooser-params">
+                <div class="col-xs-12">
+                    <label for="key">Parameter name</label><input type="text" name="key" value="">
+                </div>
+                <div class="col-xs-12">
+                    <label for="value">Parameter value</label><input type="text" name="value" value="">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <button id="configChooserSubmitBtn" type="submit" class="btn btn-default center-block">Set config</button>
+                </div>
+            </div>
+        </form>
+    </div>
 	<div class="row margin-bottom-5">
 	    <form id="configProcessors" action="/configProcessors" method="POST">
 	        <div class="row margin-bottom-2">

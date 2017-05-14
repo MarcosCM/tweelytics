@@ -14,14 +14,17 @@ var configProcessorsParamsNumber = 1;
 var configProcessorsForm = null;
 var configProcessorsParams = null;
 var configProcessorsAddParamBtn = null;
+var configChooserForm = null;
 
 $(document).ready(function() {
 	qTextInput = $('input#q');
 	searchFilters = $(".search-filter input");
 	resultsBlock = $("#resultsBlock");
-	configProcessorsForm = $('#configProcessorsProcessors');
+	configProcessorsForm = $('#configProcessors');
 	configProcessorsParams = $('.configProcessors-params');
-	configProcessorsAddParamBtn = $('#configProcessorsProcessorsAddParam');
+	configProcessorsAddParamBtn = $('#configProcessorsAddParam');
+    configChooserForm = $('#configChooser');
+    configChooserParams = $('.configChooser-params');
 	$("[id$='Results']").each(function(idx){
 		var id = $(this).attr('id');
 		analyticsResults[id] = $(this);
@@ -66,6 +69,14 @@ function registerConfig() {
 
 		event.preventDefault();
 	});
+
+    configChooserForm.submit(function(event){
+        var url = configChooserForm.attr('action');
+        var data = configChooserForm.serialize();
+        $.post(url, data);
+
+        event.preventDefault();
+    });
 }
 
 function registerSearch() {

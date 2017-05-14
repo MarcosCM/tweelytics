@@ -1,6 +1,7 @@
 package es.unizar.tmdad.tweelytics.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -98,14 +99,18 @@ public class TwitterLookupService {
 	public void setParam(String key, String value){
 		fillComponentConfig();
 		config.getParams().put(key, value);
+		configsRepository.save(config);
 	}
 	
 	private void fillComponentConfig(){
 		if (config == null){
 			config = configsRepository.findByComponent("chooser");
-			if (config == null) config = new ComponentConfig();
+			if (config == null){
+				config = new ComponentConfig();
+			}
 		}
-		
+		if (config.getParams() == null) config.setParams(new HashMap<String, String>());
+		if (config.getComponent() == null) config.setComponent("chooser");
 		if (config.getParams().get("highlightMode") == null) config.setParam("highlightMode", "<strong>$1</strong>");
 	}
 }

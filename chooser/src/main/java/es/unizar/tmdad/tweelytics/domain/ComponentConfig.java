@@ -1,9 +1,14 @@
 package es.unizar.tmdad.tweelytics.domain;
 
+import java.math.BigInteger;
 import java.util.Map;
+
+import org.springframework.data.annotation.Id;
 
 public class ComponentConfig {
 
+	@Id
+	private BigInteger id;
 	private Map<String, String> params;
 	private String component;
 	
@@ -27,5 +32,13 @@ public class ComponentConfig {
 
 	public void setComponent(String component) {
 		this.component = component;
+	}
+
+	public BigInteger getId() {
+		return id;
+	}
+
+	public void setId(BigInteger id) {
+		this.id = id;
 	}
 }
