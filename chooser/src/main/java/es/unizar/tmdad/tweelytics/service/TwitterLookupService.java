@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import es.unizar.tmdad.tweelytics.config.MessageBrokerConfig;
 import es.unizar.tmdad.tweelytics.domain.ComponentConfig;
 import es.unizar.tmdad.tweelytics.entities.AnalyzedTweetListenerContainer;
+import es.unizar.tmdad.tweelytics.entities.AnalyzedTweetMessageHandler;
 import es.unizar.tmdad.tweelytics.repository.ConfigsRepository;
 import es.unizar.tmdad.tweelytics.service.SimpleStreamListener;
 
@@ -39,6 +40,9 @@ public class TwitterLookupService {
 	
 	@Autowired
 	private AnalyzedTweetListenerContainer analyzedTweetListenerContainer;
+	
+	@Autowired
+	private AnalyzedTweetMessageHandler analyzedTweetMessageHandler;
 	
 	@Autowired
 	private RabbitAdmin rabbitAdmin;
@@ -84,7 +88,7 @@ public class TwitterLookupService {
 		fsp.track(query);
 		
 		List<StreamListener> l = new ArrayList<StreamListener>();
-		l.add(new SimpleStreamListener(query, rabbitTemplate, toProcessorsTweetExchangeName, config.getParams().get("highlightMode").toString()));
+		l.add(new SimpleStreamListener(query, rabbitTemplate, toProcessorsTweetExchangeName));
 		
 		streams.putIfAbsent(query, twitterTemplate.streamingOperations()
 				.filter(fsp, l));
@@ -99,6 +103,7 @@ public class TwitterLookupService {
 	public void setParam(String key, String value){
 		fillComponentConfig();
 		config.getParams().put(key, value);
+		if (key.equals("highlightMode")) analyzedTweetMessageHandler.setHighlightMode(value);
 		configsRepository.save(config);
 	}
 	

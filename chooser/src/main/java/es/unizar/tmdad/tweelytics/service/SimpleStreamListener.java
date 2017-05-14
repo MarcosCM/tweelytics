@@ -17,13 +17,11 @@ public class SimpleStreamListener implements StreamListener {
 	private String query;
 	private RabbitTemplate rabbitTemplate;
 	private String toProcessorsExchangeName;
-	private String highlightMode;
 	
-	public SimpleStreamListener(String query, RabbitTemplate rabbitTemplate, String toProcessorsExchangeName, String highlightMode){
+	public SimpleStreamListener(String query, RabbitTemplate rabbitTemplate, String toProcessorsExchangeName){
 		this.query = query;
 		this.rabbitTemplate = rabbitTemplate;
 		this.toProcessorsExchangeName = toProcessorsExchangeName;
-		this.highlightMode = highlightMode;
 	}
 	
 	@Override
@@ -40,7 +38,7 @@ public class SimpleStreamListener implements StreamListener {
 	public void onTweet(Tweet tweet) {
 		logger.info("Received tweet from query "+ query);
 		
-		QueriedTweet queriedTweet = new QueriedTweet(tweet, query, highlightMode);
+		QueriedTweet queriedTweet = new QueriedTweet(tweet, query);
 		
 		rabbitTemplate.convertAndSend(toProcessorsExchangeName, queriedTweet.getMyQuery(), queriedTweet);
 	}

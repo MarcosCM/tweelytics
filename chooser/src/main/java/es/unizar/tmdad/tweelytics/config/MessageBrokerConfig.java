@@ -75,12 +75,18 @@ public class MessageBrokerConfig {
 	}
 	
 	@Bean
+	public AnalyzedTweetMessageHandler analyzedTweetMessageHandler(){
+		return new AnalyzedTweetMessageHandler(messageSendingOperations);
+	}
+	
+	@Bean
 	public AnalyzedTweetListenerContainer analyzedTweetListenerContainer(){
 		CachingConnectionFactory connectionFactory = cachingConnectionFactory();
+		AnalyzedTweetMessageHandler analyzedTweetMessageHandler = analyzedTweetMessageHandler();
 		
 		AnalyzedTweetListenerContainer container = new AnalyzedTweetListenerContainer(connectionFactory);
 		
-		container.setMessageListener(new MessageListenerAdapter(new AnalyzedTweetMessageHandler(messageSendingOperations), jsonMessageConverter()));
+		container.setMessageListener(new MessageListenerAdapter(analyzedTweetMessageHandler, jsonMessageConverter()));
 		container.start();
 		
 		return container;

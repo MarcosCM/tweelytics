@@ -24,12 +24,14 @@ public abstract class AbstractAnalyzer implements Analyzer{
 	
 	@Override
 	public void configAnalyzer(Map<String, Object> params) {
+		fillComponentConfig();
 		this.config.getParams().putAll(params);
 		if (configsRepository != null) configsRepository.save(config);
 	}
 	
-	public void setConfigsRepository(ConfigsRepository configsRepository){
+	public Analyzer setConfigsRepository(ConfigsRepository configsRepository){
 		this.configsRepository = configsRepository;
+		return this;
 	}
 	
 	public void fillComponentConfig(){
@@ -40,11 +42,11 @@ public abstract class AbstractAnalyzer implements Analyzer{
 			}
 		}
 		if (config.getParams() == null) config.setParams(new HashMap<String, Object>());
-		if (config.getComponent() == null) config.setComponent("chooser");
-		if (config.getParams().get("highlightMode") == null) config.setParam("highlightMode", "<strong>$1</strong>");
+		if (config.getComponent() == null) config.setComponent("processor");
 	}
 	
 	public ComponentConfig getComponentConfig(){
+		fillComponentConfig();
 		return config;
 	}
 }
