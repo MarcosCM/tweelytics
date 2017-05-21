@@ -1,6 +1,7 @@
 /* STOMP, SockJS, WebSockets */
 var webSocketEndpoint = '/twitterSearch';
 var subscriptionEndpointPrefix = '/queue/search';
+var getSavedTweetsEndpoint = '/getSavedTweets';
 
 var stompClient = null;
 var subscriptions = {};
@@ -15,16 +16,49 @@ var configProcessorsForm = null;
 var configProcessorsParams = null;
 var configProcessorsAddParamBtn = null;
 var configChooserForm = null;
+var clearBtn = null;
+var getSavedTweetsBtn = null;
+var getSavedTweetsBlock = null;
 
 $(document).ready(function() {
 	qTextInput = $('input#q');
 	searchFilters = $(".search-filter input");
 	resultsBlock = $("#resultsBlock");
+	getSavedTweetsBlock = $("#getSavedTweetsBlock");
 	configProcessorsForm = $('#configProcessors');
 	configProcessorsParams = $('.configProcessors-params');
 	configProcessorsAddParamBtn = $('#configProcessorsAddParam');
     configChooserForm = $('#configChooser');
     configChooserParams = $('.configChooser-params');
+    clearBtn = $("#clearBtn");
+    clearBtn.click(function(){
+        getSavedTweetsBlock.empty();
+    	resultsBlock.empty();
+    });
+    getSavedTweetsBtn = $("#getSavedTweetsBtn");
+    getSavedTweetsBtn.click(function(){
+    	var keyword = qTextInput.val();
+    	var limit = $("input#getSavedTweetsLimit").val();
+    	$.get(getSavedTweetsEndpoint,
+    		{keyword: keyword, limit: limit},
+    		function(data){
+    			getSavedTweetsBlock.empty();
+    			var receivedTweets = '';
+    			$.each(data, function(idx, el){
+    				var elIdStr = el.customTweet.idStr;
+					receivedTweets +='<div class="row panel panel-default">'
+							+ '<div class="panel-heading">'
+							+ '		<a href="https://twitter.com/'+ el.customTweet.fromUser +'" target="_blank"><b>@'+ el.customTweet.fromUser +'</b></a>'
+							+ '		<div class="pull-right">'
+							+ '			<a href="https://twitter.com/'+ el.customTweet.fromUser +'/status/'+ el.customTweet.idStr +'" target="_blank"><span class="glyphicon glyphicon-link"></span></a>'
+							+ '		</div>'
+							+ '</div>'
+							+ '<div class="panel-body">'+ el.customTweet.text +'</div>'
+							+ '</div>';
+    			});
+    			getSavedTweetsBlock.prepend(receivedTweets);
+    		});
+    });
 	$("[id$='Results']").each(function(idx){
 		var id = $(this).attr('id');
 		analyticsResults[id] = $(this);
