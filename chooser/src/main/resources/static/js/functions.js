@@ -10,6 +10,7 @@ var resultsBlock = null;
 var analyticsResults = {};
 var searchFilters = null;
 var total = {};
+var amountAnalyzedTweets = {};
 var normalized = {};
 var configProcessorsParamsNumber = 1;
 var configProcessorsForm = null;
@@ -158,11 +159,11 @@ function subscribeTweetQuery() {
 						+ '<div class="panel-heading">'
 						+ '		<a href="https://twitter.com/'+ response.queriedTweet.fromUser +'" target="_blank"><b>@'+ response.queriedTweet.fromUser +'</b></a>'
 						+ '		<div class="pull-right">'
+						+ '			<span>Analyzed by '+ response.analyzedBy +'</span>'
 						+ '			<a href="https://twitter.com/'+ response.queriedTweet.fromUser +'/status/'+ response.queriedTweet.id +'" target="_blank"><span class="glyphicon glyphicon-link"></span></a>'
 						+ '		</div>'
 						+ '</div>'
-						+ '<div class="panel-body">'+ response.queriedTweet.text +'</div>'
-						+ '</div>';
+						+ '<div class="panel-body">'+ response.queriedTweet.text +'</div>';
 
 				$.each(response.analyticsResults, function(idx, val){
 					if (total[idx] == null) total[idx] = val;
@@ -171,27 +172,36 @@ function subscribeTweetQuery() {
 					else total[filterName] += val;
 				});
 
+				if (amountAnalyzedTweets[filterName] == null) amountAnalyzedTweets[filterName] = 1;
+				else amountAnalyzedTweets[filterName] += 1;
+
 				// Parse analytics results
 				var analyticsContent = '';
+				analyticsContent += '<div class="row text-center">'
+						+ '		<div class="col-xs-12"><h2>'+filterName+' processor analyzed '+amountAnalyzedTweets[filterName]+' tweets</h2></div>';
+				analyticsContent += '</div>';
+
 				analyticsContent += '<div class="row text-center">'
 						+ '		<div class="col-xs-12"><h2>'+filterName+' analysis (total)</h2></div>';
 
 				$.each(response.analyticsResults, function(idx, val){
-					analyticsContent += '<div class="col-xs-12">'+idx+': '+total[idx]+'</div>';
+					analyticsContent += '<div class="col-xs-12">'+idx+': '+total[idx].toFixed(2)+'</div>';
 				});
 
 				analyticsContent += '</div>'
 						+ '<div class="row text-center">'
-		                + '     <div class="col-xs-12"><h2>'+filterName+' analysis (normalized)</h2></div>';
+		                + '     <div class="col-xs-12"><h2>'+filterName+' analysis (percentage)</h2></div>';
 
 		        $.each(response.analyticsResults, function(idx, val){
 		        	normalized[idx] = total[idx] / total[filterName];
-					analyticsContent += '<div class="col-xs-12">'+idx+': '+normalized[idx]+'</div>';
+					analyticsContent += '<div class="col-xs-12">'+idx+': '+normalized[idx].toFixed(2)+'</div>';
 				});
 
 		        analyticsContent += '</div>';
 				// Set content
 				analyticsResults[filterName+'Results'].html(analyticsContent);
+
+				tweetContent += '</div>';
 				resultsBlock.prepend(tweetContent);
 			}, function(error){
 				// Error connecting to the endpoint
