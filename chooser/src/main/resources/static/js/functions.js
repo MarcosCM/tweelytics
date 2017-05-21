@@ -165,12 +165,16 @@ function subscribeTweetQuery() {
 						+ '</div>'
 						+ '<div class="panel-body">'+ response.queriedTweet.text +'</div>';
 
+                tweetContent += '<div class="panel-body">';
 				$.each(response.analyticsResults, function(idx, val){
 					if (total[idx] == null) total[idx] = val;
 					else total[idx] += val;
 					if (total[filterName] == null) total[filterName] = val;
 					else total[filterName] += val;
+
+                    tweetContent += '<div class="row"><div class="col-xs-12">'+idx+': '+val.toFixed(2)+'</div></div>';
 				});
+                tweetContent += '</div>';
 
 				if (amountAnalyzedTweets[filterName] == null) amountAnalyzedTweets[filterName] = 1;
 				else amountAnalyzedTweets[filterName] += 1;
