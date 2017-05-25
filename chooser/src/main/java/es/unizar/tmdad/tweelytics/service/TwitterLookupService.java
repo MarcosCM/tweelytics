@@ -84,6 +84,28 @@ public class TwitterLookupService {
 	public void search(String query) {
 		fillComponentConfig();
 		
+		/*int size = 50000;
+		QueriedTweet[] list = new QueriedTweet[size];
+		for(int i=0; i<size; i++){
+			list[i] = new QueriedTweet();
+			String s = "";
+			// set 1024 bytes text to simulate sending a tweet with at least 1024 bytes
+			for(int j=0; j<1024; j++) s += "a";
+			list[i].setText(s);
+			list[i].setMyQuery("syria");
+			list[i].setCustomTweet(new CustomTweet());
+		}
+		
+		System.out.println("Comienzo");
+		long millis = System.currentTimeMillis();
+		
+		for(int i=0; i<size; i++){
+			rabbitTemplate.convertAndSend(toProcessorsTweetExchangeName, "syria", list[i]);
+		}
+		
+		millis = System.currentTimeMillis() - millis;
+		System.out.println("Fin, tiempo: "+millis+" ms");*/
+		
 		FilterStreamParameters fsp = new FilterStreamParameters();
 		fsp.track(query);
 		
