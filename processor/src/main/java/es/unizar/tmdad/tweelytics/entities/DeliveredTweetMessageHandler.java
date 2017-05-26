@@ -26,6 +26,10 @@ public class DeliveredTweetMessageHandler {
 	public void handleMessage(QueriedTweet queriedTweet) {
 		logger.info("Processor got tweet for query: "+queriedTweet.getMyQuery());
 		
+		/* Experiment: measuring time to process a tweet to know how many tweets */
+		/*			   a processor is capable of processing per unit of time	 */
+		/*long millis = System.currentTimeMillis();*/
+		
 		Map<String, Double> res = null;
 		try {
 			res = analyzer.singleAnalysis(queriedTweet);
@@ -39,5 +43,8 @@ public class DeliveredTweetMessageHandler {
 		analyzedTweet.setAnalyzedBy(System.getProperty("analyzer"));
 		
 		rabbitTemplate.convertAndSend(toChooserExchangeName, queriedTweet.getMyQuery(), analyzedTweet);
+		
+		/*millis = System.currentTimeMillis() - millis;
+		logger.info("Processed tweet in "+millis+" ms");*/
 	}
 }

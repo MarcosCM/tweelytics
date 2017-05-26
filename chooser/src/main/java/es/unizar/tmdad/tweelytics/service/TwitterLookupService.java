@@ -86,6 +86,8 @@ public class TwitterLookupService {
 	public void search(String query) {
 		fillComponentConfig();
 		
+		/* Experiment: measuring time to send a high number of tweets to the broker */
+		/* 			   to know whether it is necessary more bandwith				*/
 		/*int size = 1000;
 		QueriedTweet[] list = new QueriedTweet[size];
 		for(int i=0; i<size; i++){
