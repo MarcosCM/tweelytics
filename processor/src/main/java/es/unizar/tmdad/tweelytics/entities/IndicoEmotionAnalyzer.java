@@ -37,6 +37,7 @@ public class IndicoEmotionAnalyzer extends AbstractIndicoTextAnalyzer implements
 		try {
 			emotionResult = indicoApiBatchTextAnalysis(queriedTweets, this.getComponentConfig().getParams()).getEmotion();
 		} catch (IndicoException | IOException e) {
+			logger.info("error in batchAnalysis");
 			logger.info(e.getMessage());
 			return null;
 		}

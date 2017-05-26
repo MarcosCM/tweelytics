@@ -14,6 +14,7 @@ import io.indico.api.utils.IndicoException;
 public abstract class AbstractIndicoTextAnalyzer extends AbstractAnalyzer{
 
 	protected Indico indico;
+	protected Api[] indicoQueriedApis;
 	
 	/**
 	 * Creates a new text analyzer using the Indico API
@@ -22,8 +23,7 @@ public abstract class AbstractIndicoTextAnalyzer extends AbstractAnalyzer{
 	 */
 	public AbstractIndicoTextAnalyzer(String apiKey, Api[] indicoQueriedApis) throws IndicoException{
 		this.indico = new Indico(apiKey);
-		fillComponentConfig();
-		this.getComponentConfig().getParams().put("apis", indicoQueriedApis);
+		this.indicoQueriedApis = indicoQueriedApis;
 	}
 	
 	/**
@@ -35,6 +35,8 @@ public abstract class AbstractIndicoTextAnalyzer extends AbstractAnalyzer{
 	 * @throws IOException
 	 */
 	protected BatchIndicoResult indicoApiBatchTextAnalysis(List<QueriedTweet> queriedTweets, Map<String, Object> params) throws IndicoException, IOException{
+		fillComponentConfig();
+		this.getComponentConfig().getParams().put("apis", indicoQueriedApis);
 		return indico.text
 				.predict(queriedTweets.stream()
 					.map(myTw -> myTw.getOriginalText())

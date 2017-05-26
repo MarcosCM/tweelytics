@@ -21,6 +21,8 @@ import org.springframework.stereotype.Service;
 
 import es.unizar.tmdad.tweelytics.config.MessageBrokerConfig;
 import es.unizar.tmdad.tweelytics.domain.ComponentConfig;
+import es.unizar.tmdad.tweelytics.domain.CustomTweet;
+import es.unizar.tmdad.tweelytics.domain.QueriedTweet;
 import es.unizar.tmdad.tweelytics.entities.AnalyzedTweetListenerContainer;
 import es.unizar.tmdad.tweelytics.entities.AnalyzedTweetMessageHandler;
 import es.unizar.tmdad.tweelytics.repository.ConfigsRepository;
@@ -84,16 +86,17 @@ public class TwitterLookupService {
 	public void search(String query) {
 		fillComponentConfig();
 		
-		/*int size = 50000;
+		/*int size = 1000;
 		QueriedTweet[] list = new QueriedTweet[size];
 		for(int i=0; i<size; i++){
 			list[i] = new QueriedTweet();
 			String s = "";
 			// set 1024 bytes text to simulate sending a tweet with at least 1024 bytes
 			for(int j=0; j<1024; j++) s += "a";
-			list[i].setText(s);
+			//list[i].setText(s);
 			list[i].setMyQuery("syria");
 			list[i].setCustomTweet(new CustomTweet());
+			list[i].getCustomTweet().setText(s);
 		}
 		
 		System.out.println("Comienzo");
@@ -104,8 +107,8 @@ public class TwitterLookupService {
 		}
 		
 		millis = System.currentTimeMillis() - millis;
-		System.out.println("Fin, tiempo: "+millis+" ms");*/
-		
+		System.out.println("Fin, tiempo: "+millis+" ms");
+		*/
 		FilterStreamParameters fsp = new FilterStreamParameters();
 		fsp.track(query);
 		
