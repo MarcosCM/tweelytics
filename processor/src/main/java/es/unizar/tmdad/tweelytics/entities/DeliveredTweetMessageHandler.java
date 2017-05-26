@@ -24,14 +24,12 @@ public class DeliveredTweetMessageHandler {
 	}
 	
 	public void handleMessage(QueriedTweet queriedTweet) {
-		//logger.info("Processor got tweet for query: "+queriedTweet.getMyQuery());
-		long millis = System.currentTimeMillis();
+		logger.info("Processor got tweet for query: "+queriedTweet.getMyQuery());
 		
 		Map<String, Double> res = null;
 		try {
 			res = analyzer.singleAnalysis(queriedTweet);
 		} catch (Exception e) {
-			logger.info("error in singleAnalysis");
 			logger.info(e.getMessage());
 		}
 		
@@ -41,8 +39,5 @@ public class DeliveredTweetMessageHandler {
 		analyzedTweet.setAnalyzedBy(System.getProperty("analyzer"));
 		
 		rabbitTemplate.convertAndSend(toChooserExchangeName, queriedTweet.getMyQuery(), analyzedTweet);
-		
-		millis = System.currentTimeMillis() - millis;
-		logger.info("Analyzed sentiment in "+millis+" ms");
 	}
 }
