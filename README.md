@@ -1,6 +1,6 @@
 # Tweelytics
 
-Application which fetches real-time tweets based on keywords and geolocation determined by the end user and performs sentiment analysis by using the [Indico API](https://indico.io/docs) on them to predict:
+Application which fetches real-time tweets based on keywords and geolocation determined by the end user and performs sentiment analysis on them by using the [Indico API](https://indico.io/docs) to predict:
 * Audience engagement
 * Political leaning
 * Emotions
