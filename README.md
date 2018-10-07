@@ -32,3 +32,5 @@ Some Spring application parameters which can be overriden:
 * ``server.port``. Default: 8080/8081/8082 for chooser/processor/saver.
 * ``analyzers.mock``. Default: true. If true gets random predictions instead of using the Indico API.
 * ``saver.mock``. Default: false. If true mocks the DB.
+
+Gradle can be used to run the chooser, processors and saver.
