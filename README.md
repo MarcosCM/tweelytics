@@ -28,7 +28,7 @@ Required environment/system parameters:
 * MongoDB: ``MONGO_HOST``, ``MONGO_PORT``, ``MONGO_USER``, ``MONGO_PW``, ``MONGO_DB``.
 * RabbitMQ: ``RABBITMQ.AMQPURL``, ``RABBITMQ.HOST``, ``RABBITMQ.USER``, ``RABBITMQ.PW``, ``RABBITMQ.VHOST``.
 
-Some Spring application parameters which can be overriden:
+Some Spring application parameters which can be overwritten:
 * ``server.port``. Default: 8080/8081/8082 for chooser/processor/saver.
 * ``analyzers.mock``. Default: true. If true gets random predictions instead of using the Indico API.
 * ``saver.mock``. Default: false. If true mocks the DB.
